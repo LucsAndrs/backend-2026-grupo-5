@@ -9,7 +9,6 @@ class EstadoPago(str, Enum):
 
 class Pago(BaseModel):
     id_pago: str
-    id_venta: str
     fecha_pago: date
     monto: float
     metodo_pago: str
