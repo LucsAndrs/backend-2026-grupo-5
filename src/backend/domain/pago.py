@@ -12,4 +12,4 @@ class Pago(BaseModel):
     fecha_pago: date
     monto: float
     metodo_pago: str
-    estado_pago: EstadoPago
+    estado_pago: EstadoPago 
