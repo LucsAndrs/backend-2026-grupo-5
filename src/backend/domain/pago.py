@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from dataclasses import dataclass
 from enum import Enum
 from datetime import date
 
@@ -7,7 +7,8 @@ class EstadoPago(str, Enum):
     EXITOSO = "exitoso"
     RECHAZADO = "rechazado"
 
-class Pago(BaseModel):
+@dataclass
+class Pago:
     id_pago: str
     fecha_pago: date
     monto: float
