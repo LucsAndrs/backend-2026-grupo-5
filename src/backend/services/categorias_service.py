@@ -1,10 +1,12 @@
 from ..domain.categoria import Categoria
+from ..schemas.categoria import CategoriaCreate
 
 categorias: list[Categoria] =  []
 
-def crear_categoria(categoria: Categoria):
-     categorias.append(categoria)
-     return categoria
+def crear_categoria(categoria: CategoriaCreate):
+     entidad = Categoria(**categoria.model_dump())
+     categorias.append(entidad)
+     return entidad
  
 def obtener_categoria(id_categoria: str):
     for categoria in categorias:
