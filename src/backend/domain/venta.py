@@ -5,10 +5,10 @@ from backend.domain.detalleventa import DetalleVenta
 
 @dataclass
 class Venta:
-    id: int
+    id: str
     fecha_venta: date
     cliente: str
-    total: 0.0
+    total: float
     detalles: list[DetalleVenta] = field(default_factory=list)
 
     def agregar_detalle(self, detalle: DetalleVenta):
