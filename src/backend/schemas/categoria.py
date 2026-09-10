@@ -1,8 +1,13 @@
 from pydantic import BaseModel
-from datetime import date
+from typing import Optional
 
 class CategoriaCreate(BaseModel):
     nombre_categoria: str
     descripcion: str
-    fecha_creacion: date
     activa: bool
+    
+class CategoriaPatch(BaseModel):
+    nombre_categoria: Optional[str] = None
+    descripcion: Optional[str] = None
+    activa: Optional[bool] = None
+    
