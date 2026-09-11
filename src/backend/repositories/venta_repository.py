@@ -1,20 +1,16 @@
 from backend.domain.venta import Venta
 
-class VentaRepository:
-    def __init__(self):
-        self.diccionario = {}
-        self.nuevo_id = 1
+ventas: list[Venta] = []
 
-    def crear_venta(self, venta: Venta):
-        venta.id = self.nuevo_id
-        self.diccionario[venta.id] = venta
-        self.nuevo_id = self.nuevo_id + 1
-        return venta
+def crear_venta(venta: Venta):
+    ventas.append(venta)
+    return venta
 
-    def obtener_por_id(self, id_venta: int):
-        return self.diccionario.get(id_venta)
+def obtener_por_id(id_venta: str):
+    for venta in ventas:
+        if venta.id_venta == id_venta:
+            return venta
+    raise KeyError("Venta no encontrada")
 
-    def listar_todas(self):
-        return list(self.diccionario.values())
-
-venta_repositorio = VentaRepository()
+def listar_todas():
+    return ventas

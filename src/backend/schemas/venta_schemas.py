@@ -3,8 +3,8 @@ from typing import Optional
 
 from pydantic import BaseModel, Field
 
-from backend.schemas.detalleventa import DetalleVentaCreate, DetalleVentaOut
-from backend.schemas.pago import PagoOut
+from backend.schemas.detalle_venta_create import DetalleVentaCreate, DetalleVentaResponse
+from backend.schemas.pago_schemas import PagoResponse
 
 class VentaCreate(BaseModel):
     cliente: str = Field(..., min_length=5, max_length=90)
@@ -15,5 +15,5 @@ class VentaOut(BaseModel):
     fecha_venta: date
     cliente: str
     total: float
-    detalles: list[DetalleVentaOut]
-    pago: Optional[PagoOut] = []
+    detalles: list[DetalleVentaResponse]
+    pago: Optional[PagoResponse] = None
