@@ -1,14 +1,14 @@
 import uuid
-from domain.detalleventa import DetalleVenta
-from schemas.detallecreate import DetalleVentaCreate
-from repositories.detalle_repository import DetalleVentaRepository
+from backend.domain.detalleventa import DetalleVenta
+from backend.schemas.detalle_venta_create import DetalleVentaCreate
+from backend.repositories.detalle_venta_repository import DetalleVentaRepository
 
 class DetalleVentaService:
     def __init__(self, repositorio: DetalleVentaRepository):
         self.repositorio = repositorio
 
     def crear_detalle(self, datos: DetalleVentaCreate) -> DetalleVenta:
-        precio_unitario = 1500 
+        precio_unitario = 0
         subtotal = precio_unitario * datos.cantidad_producto
         iva = subtotal * 0.19
         descuento = 0.0

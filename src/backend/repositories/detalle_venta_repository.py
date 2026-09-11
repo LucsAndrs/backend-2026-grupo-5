@@ -1,4 +1,4 @@
-from domain.detalleventa import DetalleVenta
+from backend.domain.detalleventa import DetalleVenta
 from typing import List, Optional
 
 class DetalleVentaRepository:

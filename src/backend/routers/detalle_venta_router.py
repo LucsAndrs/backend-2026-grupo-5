@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, status
-from schemas.detallecreate import DetalleVentaCreate
-from services.detalle_service import DetalleVentaService
-from repositories.detalle_repository import DetalleVentaRepository
+from backend.schemas.detalle_venta_create import DetalleVentaCreate
+from backend.services.detalle_venta_service import DetalleVentaService
+from backend.repositories.detalle_venta_repository import DetalleVentaRepository
 
 router = APIRouter(prefix="/detalles", tags=["Detalles de Venta"])
 repositorio_detalles = DetalleVentaRepository()
