@@ -11,7 +11,7 @@ class VentaCreate(BaseModel):
     detalles: list[DetalleVentaCreate] = Field(..., min_length=1)
 
 class VentaOut(BaseModel):
-    id: str
+    id_venta: str
     fecha_venta: date
     cliente: str
     total: float
