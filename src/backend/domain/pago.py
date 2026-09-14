@@ -10,6 +10,7 @@ class EstadoPago(str, Enum):
 @dataclass
 class Pago:
     id_pago: str
+    id_venta: str
     fecha_pago: date
     monto: float
     metodo_pago: str

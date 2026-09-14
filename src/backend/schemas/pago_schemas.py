@@ -8,7 +8,7 @@ class PagoCreate(BaseModel):
     monto: float = Field(gt=0, description="debe ser mayor a 0")
     metodo_pago: str = Field(min_length=3, max_length=30)
 
-#DTO salida
+#DTO salida 
 class PagoResponse(BaseModel):
     id_pago: str
     id_venta: str
