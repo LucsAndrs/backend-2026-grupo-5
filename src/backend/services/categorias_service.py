@@ -1,19 +1,19 @@
 from datetime import datetime
 import math
 from ..core.exceptions import BusinessRuleError
-from ..domain.categoria import Categoria
-from ..schemas.categoria import CategoriaCreate, CategoriaPatch
+from ..domain.categorias import Categoria
+from ..schemas.categorias import CategoriaCreate, CategoriaPatch
 from ..schemas.common import PaginatedResponse
-from ..repositories.categoria_repositorie import (crear_categoria as repo_crear_categoria,
-                                                  obtener_categorias as repo_obtener_categorias,
-                                                  obtener_categoriaporid as repo_obtener_categoriaporid,
-                                                  actualizar_categoria as repo_actualizar_categoria,
-                                                  eliminar_categoria as repo_eliminar_categoria)
+from ..repositories.categorias_repositorio import (crear_categoria as repo_crear_categoria,
+                                                   obtener_categorias as repo_obtener_categorias,
+                                                   obtener_categoria_por_id as repo_obtener_categoria_por_id,
+                                                   actualizar_categoria as repo_actualizar_categoria,
+                                                   eliminar_categoria as repo_eliminar_categoria)
 
 CAMPOS_ORDEN = {"nombre_categoria", "descripcion", "activa", "fecha_creacion", "fecha_actualizacion"}
 
 
-def crear_categoria(categoria: CategoriaCreate):
+def crear_categoria(categoria: CategoriaCreate) -> Categoria:
     entidad = Categoria(**categoria.model_dump())
     return repo_crear_categoria(entidad)
 
@@ -23,7 +23,7 @@ def obtener_categorias(activa: bool | None = None,
                        ordenar_por: str = "nombre_categoria",
                        direccion: str = "asc",
                        pagina: int = 1,
-                       limite: int = 20):
+                       limite: int = 20) -> PaginatedResponse[Categoria]:
     if ordenar_por not in CAMPOS_ORDEN:
         raise BusinessRuleError(f"El campo '{ordenar_por}' no es válido para ordenar")
 
@@ -45,12 +45,12 @@ def obtener_categorias(activa: bool | None = None,
                              limite=limite, total_paginas=total_paginas)
 
 
-def obtener_categoriaporid(id_categoria: str):
-    return repo_obtener_categoriaporid(id_categoria)
+def obtener_categoria_por_id(id_categoria: str) -> Categoria:
+    return repo_obtener_categoria_por_id(id_categoria)
 
 
-def actualizar_categoria(id_categoria: str, datos: CategoriaPatch):
-    entidad = obtener_categoriaporid(id_categoria)
+def actualizar_categoria(id_categoria: str, datos: CategoriaPatch) -> Categoria:
+    entidad = obtener_categoria_por_id(id_categoria)
     if datos.nombre_categoria is not None:
         entidad.nombre_categoria = datos.nombre_categoria
     if datos.descripcion is not None:
@@ -61,5 +61,5 @@ def actualizar_categoria(id_categoria: str, datos: CategoriaPatch):
     return repo_actualizar_categoria(id_categoria, entidad)
 
 
-def eliminar_categoria(id_categoria: str):
+def eliminar_categoria(id_categoria: str) -> None:
     return repo_eliminar_categoria(id_categoria)
