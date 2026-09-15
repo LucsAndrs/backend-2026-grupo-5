@@ -28,13 +28,12 @@ def buscar_detalle_por_id(id_detalle: str):
         
     return detalle
 
-@router.delete("/{id_detalle}", status_code=status.HTTP_200_OK)
+@router.delete("/{id_detalle}", status_code=status.HTTP_204_NO_CONTENT)
 def borrar_detalle(id_detalle: str):
     detalle = servicio_detalles.obtener_detalle(id_detalle)
     if detalle is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="No se puede eliminar porque el detalle no existe."
-        )       
+        )
     servicio_detalles.eliminar_detalle(id_detalle)
-    return {"mensaje": "Detalle eliminado correctamente"}
