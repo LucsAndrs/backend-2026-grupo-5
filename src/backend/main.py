@@ -1,11 +1,10 @@
-
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from .core.exceptions import ApiError
-from .routers import categoria
+from .routers import categoria, venta_routers
 from .routers.pago_router import router as pago_router
 from .schemas.common import ErrorDetail, ErrorResponse
 
@@ -43,3 +42,4 @@ async def controlar_http_error(request: Request, exc: StarletteHTTPException):
 
 app.include_router(categoria.router)
 app.include_router(pago_router)
+app.include_router(venta_routers.router)

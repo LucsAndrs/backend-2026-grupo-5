@@ -1,5 +1,5 @@
 from backend.domain.venta import Venta
-from backend.domain.excepciones import RecursoNoEncontradoError
+from backend.core.exceptions import ResourceNotFoundError
 
 ventas: list[Venta] = []
 
@@ -11,7 +11,7 @@ def obtener_por_id(id_venta: str):
     for venta in ventas:
         if venta.id_venta == id_venta:
             return venta
-    raise RecursoNoEncontradoError(f"No existe una venta con el ID {id_venta}")
+    raise ResourceNotFoundError(f"No existe una venta con el ID {id_venta}")
 
 def listar_todas():
     return ventas
