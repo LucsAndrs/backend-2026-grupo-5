@@ -1,6 +1,10 @@
+import math
 from backend.domain.venta import Venta
 from backend.domain.detalleventa import DetalleVenta
 from backend.schemas.venta_schemas import VentaCreate
+from backend.core.exceptions import BusinessRuleError
+from backend.core.exceptions import ConflictError
+from backend.schemas.common import PaginatedResponse
 from datetime import date
 
 from backend.repositories.venta_repository import (
@@ -17,9 +21,11 @@ def calcular_total(venta: Venta):
     venta.total = total
     return total
 
+CAMPOS_ORDEN = {"cliente", "total", "fecha_venta"}
+
 def agregar_detalle(venta: Venta, detalle: DetalleVenta):
     if detalle.cantidad_producto <= 0:
-        raise ValueError("La cantidad de producto debe ser mayor a cero")
+        raise BusinessRuleError("La cantidad de producto debe ser mayor a cero")
     venta.detalles.append(detalle)
     calcular_total(venta)
 
@@ -34,10 +40,15 @@ def obtener_venta(id_venta: str):
     return repo_obtener_por_id(id_venta)
 
 def eliminar_venta(id_venta: str):
+    venta = obtener_venta(id_venta)
+    if existe_pago_exitoso(id_venta):
+        raise ConflictError("No se puede eliminar una venta que ya fue pagada")
     return repo_eliminar_venta(id_venta)
 
 def listar_venta(cliente: str = None, ordenar_por: str = None, direccion: str = "asc",
                  pagina: int = 1, limite: int = 20):
+    if ordenar_por is not None and ordenar_por not in CAMPOS_ORDEN:
+        raise BusinessRuleError(f"El campo '{ordenar_por}' no es valido para ordenar")
     ventas = repo_listar_todas()
 
     if cliente:
@@ -52,18 +63,21 @@ def listar_venta(cliente: str = None, ordenar_por: str = None, direccion: str = 
         ventas = sorted(ventas, key=lambda v: getattr(v, ordenar_por), reverse=reverse)
 
     total = len(ventas)
-    total_paginas = (total + limite - 1) // limite if total > 0 else 0
+    if total == 0:
+        total_paginas = 0
+    else:
+        total_paginas = math.ceil(total / limite)
     inicio = (pagina - 1) * limite
     fin = inicio + limite
     ventas_pagina = ventas[inicio:fin]
 
-    return{
-        "items": ventas_pagina,
-        "total": total,
-        "pagina": pagina,
-        "limite": limite,
-        "total_paginas": total_paginas,
-    }
+    return PaginatedResponse(
+        items= ventas_pagina,
+        total= total,
+        pagina= pagina,
+        limite= limite,
+        total_paginas= total_paginas,
+    )
 
 def generar_boleta(venta: Venta):
     items = []
