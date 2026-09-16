@@ -1,7 +1,8 @@
-from pydantic import BaseModel
+from dataclasses import dataclass
 from datetime import date 
 
-class Producto(BaseModel):
+@dataclass
+class Producto:
     id_producto: str
     nombre_producto: str
     stock: int
