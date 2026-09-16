@@ -13,6 +13,7 @@ from backend.repositories.venta_repository import (
     listar_todas as repo_listar_todas,
     eliminar_venta as repo_eliminar_venta,
 )
+from backend.repositories.pago_repository import pago_repositorio
 
 def calcular_total(venta: Venta):
     total = 0
@@ -40,8 +41,8 @@ def obtener_venta(id_venta: str):
     return repo_obtener_por_id(id_venta)
 
 def eliminar_venta(id_venta: str):
-    venta = obtener_venta(id_venta)
-    if existe_pago_exitoso(id_venta):
+    obtener_venta(id_venta)
+    if pago_repositorio.existe_pago_exitoso(id_venta):
         raise ConflictError("No se puede eliminar una venta que ya fue pagada")
     return repo_eliminar_venta(id_venta)
 
