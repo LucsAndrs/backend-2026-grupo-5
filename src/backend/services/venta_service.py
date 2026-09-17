@@ -1,4 +1,5 @@
 import math
+import uuid
 from backend.domain.venta import Venta
 from backend.domain.detalleventa import DetalleVenta
 from backend.schemas.venta_schemas import VentaCreate
@@ -7,6 +8,10 @@ from backend.core.exceptions import ConflictError
 from backend.schemas.common import PaginatedResponse
 from datetime import date
 
+from backend.repositories.productos_repositorio import(
+    obtener_producto_por_id as obtener_producto,
+    actualizar_producto as repo_actualizar_producto,
+)
 from backend.repositories.venta_repository import (
     crear_venta as repo_crear_venta,
     obtener_por_id as repo_obtener_por_id,
@@ -33,8 +38,25 @@ def agregar_detalle(venta: Venta, detalle: DetalleVenta):
 def crear_venta(datos: VentaCreate):
     venta = Venta(cliente=datos.cliente, fecha_venta=date.today())
     for detalle_data in datos.detalles:
-        detalle = DetalleVenta(**detalle_data.model_dump())
+        producto = obtener_producto(detalle_data.id_producto)
+        if detalle_data.cantidad_producto > producto.stock:
+            raise BusinessRuleError(
+                f"Stock insuficiente para '{producto.nombre_producto}':"
+                f" Disponible '{producto.stock}', solicitado'{detalle_data.cantidad_producto}'"
+            )
+        detalle = DetalleVenta(
+            id_detalle= str(uuid.uuid4),
+            id_producto= producto.id_producto,
+            id_venta= venta.id_venta,
+            cantidad_producto= detalle_data.cantidad_producto,
+            precio_unitario= producto.precio,
+            subtotal= detalle_data.cantidad_producto * producto.precio,
+            iva= 0.0,
+            descuento= 0.0,
+        )
         agregar_detalle(venta, detalle)
+        producto.stock -= detalle_data.cantidad_producto
+        repo_actualizar_producto(producto.id_producto, producto)
     return repo_crear_venta(venta)
 
 def obtener_venta(id_venta: str):

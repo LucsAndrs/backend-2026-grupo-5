@@ -4,7 +4,7 @@ import uuid
     
 @dataclass
 class Categoria:
-    nombre_categoria : str
+    nombre_categoria: str
     descripcion : str
     activa : bool 
     fecha_creacion : datetime = field(default_factory=datetime.now)
