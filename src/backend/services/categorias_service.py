@@ -2,15 +2,28 @@ from datetime import datetime
 import math
 from ..core.exceptions import BusinessRuleError
 from ..domain.categorias import Categoria
-from ..schemas.categorias import CategoriaCreate, CategoriaPatch
+from ..schemas.categorias import CategoriaCreate, CategoriaPatch, CategoriaResponse
 from ..schemas.common import PaginatedResponse
 from ..repositories.categorias_repositorio import (crear_categoria as repo_crear_categoria,
                                                    obtener_categorias as repo_obtener_categorias,
                                                    obtener_categoria_por_id as repo_obtener_categoria_por_id,
                                                    actualizar_categoria as repo_actualizar_categoria,
                                                    eliminar_categoria as repo_eliminar_categoria)
+from ..repositories.productos_repositorio import contar_productos_por_categoria
 
 CAMPOS_ORDEN = {"nombre_categoria", "descripcion", "activa", "fecha_creacion", "fecha_actualizacion"}
+
+
+def _a_categoria_response(categoria: Categoria) -> CategoriaResponse:
+    return CategoriaResponse(
+        id_categoria=categoria.id_categoria,
+        nombre_categoria=categoria.nombre_categoria,
+        descripcion=categoria.descripcion,
+        activa=categoria.activa,
+        fecha_creacion=categoria.fecha_creacion,
+        fecha_actualizacion=categoria.fecha_actualizacion,
+        cantidad_productos=contar_productos_por_categoria(categoria.id_categoria),
+    )
 
 
 def crear_categoria(categoria: CategoriaCreate) -> Categoria:
@@ -23,7 +36,7 @@ def obtener_categorias(activa: bool | None = None,
                        ordenar_por: str = "nombre_categoria",
                        direccion: str = "asc",
                        pagina: int = 1,
-                       limite: int = 20) -> PaginatedResponse[Categoria]:
+                       limite: int = 20) -> PaginatedResponse[CategoriaResponse]:
     if ordenar_por not in CAMPOS_ORDEN:
         raise BusinessRuleError(f"El campo '{ordenar_por}' no es válido para ordenar")
 
@@ -39,18 +52,18 @@ def obtener_categorias(activa: bool | None = None,
     total = len(filtradas)
     total_paginas = math.ceil(total / limite) if total > 0 else 0
     inicio = (pagina - 1) * limite
-    items = filtradas[inicio:inicio + limite]
+    items = [_a_categoria_response(c) for c in filtradas[inicio:inicio + limite]]
 
     return PaginatedResponse(items=items, total=total, pagina=pagina,
                              limite=limite, total_paginas=total_paginas)
 
 
-def obtener_categoria_por_id(id_categoria: str) -> Categoria:
-    return repo_obtener_categoria_por_id(id_categoria)
+def obtener_categoria_por_id(id_categoria: str) -> CategoriaResponse:
+    return _a_categoria_response(repo_obtener_categoria_por_id(id_categoria))
 
 
-def actualizar_categoria(id_categoria: str, datos: CategoriaPatch) -> Categoria:
-    entidad = obtener_categoria_por_id(id_categoria)
+def actualizar_categoria(id_categoria: str, datos: CategoriaPatch) -> CategoriaResponse:
+    entidad = repo_obtener_categoria_por_id(id_categoria)
     if datos.nombre_categoria is not None:
         entidad.nombre_categoria = datos.nombre_categoria
     if datos.descripcion is not None:
@@ -58,7 +71,8 @@ def actualizar_categoria(id_categoria: str, datos: CategoriaPatch) -> Categoria:
     if datos.activa is not None:
         entidad.activa = datos.activa
     entidad.fecha_actualizacion = datetime.now()
-    return repo_actualizar_categoria(id_categoria, entidad)
+    repo_actualizar_categoria(id_categoria, entidad)
+    return _a_categoria_response(entidad)
 
 
 def eliminar_categoria(id_categoria: str) -> None:
