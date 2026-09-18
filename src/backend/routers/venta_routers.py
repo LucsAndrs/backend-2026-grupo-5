@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Query, status
 from backend.schemas.venta_schemas import VentaCreate, VentaOut
+from backend.schemas.common import PaginatedResponse
 from backend.services.venta_service import(
     crear_venta,
     obtener_venta,
@@ -15,7 +16,7 @@ def post_venta(datos: VentaCreate):
     venta = crear_venta(datos)
     return venta
 
-@router.get("")
+@router.get("", response_model= PaginatedResponse[VentaOut])
 def get_ventas(cliente: str = None, ordenar_por: str = None, direccion: str = "asc",
                pagina: int = Query(1, ge=1), limite: int = Query(20, ge=1, le=100)):
     return listar_venta(cliente, ordenar_por, direccion, pagina, limite)
