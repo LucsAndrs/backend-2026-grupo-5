@@ -9,7 +9,6 @@ from backend.schemas.pago_schemas import PagoCreate
 
 
 def procesar_pago(datos: PagoCreate) -> Pago:
-    # Si la venta no existe, obtener_por_id ya lanza ResourceNotFoundError por sí solo
     obtener_venta_por_id(datos.id_venta)
 
     if pago_repositorio.existe_pago_exitoso(datos.id_venta):
