@@ -1,6 +1,8 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from enum import Enum
 from datetime import date
+import uuid
+
 
 class EstadoPago(str, Enum):
     PENDIENTE = "pendiente"
@@ -9,9 +11,9 @@ class EstadoPago(str, Enum):
 
 @dataclass
 class Pago:
-    id_pago: str
-    id_venta: str
+    id_venta: str 
     fecha_pago: date
     monto: float
     metodo_pago: str
     estado_pago: EstadoPago 
+    id_pago: str = field(default_factory=lambda: str(uuid.uuid4()))
