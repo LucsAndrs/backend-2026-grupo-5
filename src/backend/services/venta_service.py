@@ -3,8 +3,7 @@ import uuid
 from backend.domain.venta import Venta
 from backend.domain.detalleventa import DetalleVenta
 from backend.schemas.venta_schemas import VentaCreate
-from backend.core.exceptions import BusinessRuleError
-from backend.core.exceptions import ConflictError
+from backend.core.exceptions import BusinessRuleError, ConflictError
 from backend.schemas.common import PaginatedResponse
 from datetime import date
 
@@ -37,13 +36,21 @@ def agregar_detalle(venta: Venta, detalle: DetalleVenta):
 
 def crear_venta(datos: VentaCreate):
     venta = Venta(cliente=datos.cliente, fecha_venta=date.today())
+
+    productos_validados = []
     for detalle_data in datos.detalles:
+        if detalle_data.cantidad_producto <= 0:
+            raise BusinessRuleError("La cantidad de producto debe ser mayor a cero")
+
         producto = obtener_producto(detalle_data.id_producto)
         if detalle_data.cantidad_producto > producto.stock:
             raise BusinessRuleError(
                 f"Stock insuficiente para '{producto.nombre_producto}':"
                 f" Disponible '{producto.stock}', solicitado'{detalle_data.cantidad_producto}'"
             )
+        productos_validados.append((producto, detalle_data))
+
+    for producto, detalle_data in productos_validados:
         detalle = DetalleVenta(
             id_detalle= str(uuid.uuid4),
             id_producto= producto.id_producto,
