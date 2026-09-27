@@ -5,6 +5,7 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from .core.exceptions import ApiError
 from .routers import categorias, productos, venta_routers
+from .routers.pago_router import router as pago_router
 from .routers.detalle_venta_router import router as detalle_venta_router
 from .schemas.common import ErrorDetail, ErrorResponse
 
@@ -42,3 +43,4 @@ app.include_router(venta_routers.router)
 app.include_router(categorias.router)
 app.include_router(productos.router)
 app.include_router(detalle_venta_router)
+app.include_router(pago_router)
