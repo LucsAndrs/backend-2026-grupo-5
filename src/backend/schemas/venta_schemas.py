@@ -7,7 +7,7 @@ from backend.schemas.detalle_venta_create import DetalleVentaCreate, DetalleVent
 from backend.schemas.pago_schemas import PagoResponse
 
 class VentaCreate(BaseModel):
-    cliente: str = Field(..., min_length=5, max_length=90)
+    cliente: str = Field(..., min_length=3, max_length=90)
     detalles: list[DetalleVentaCreate] = Field(..., min_length=1)
 
 class VentaOut(BaseModel):
