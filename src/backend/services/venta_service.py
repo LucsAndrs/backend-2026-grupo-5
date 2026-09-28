@@ -52,7 +52,7 @@ def crear_venta(datos: VentaCreate):
 
     for producto, detalle_data in productos_validados:
         detalle = DetalleVenta(
-            id_detalle= str(uuid.uuid4),
+            id_detalle= str(uuid.uuid4()),
             id_producto= producto.id_producto,
             id_venta= venta.id_venta,
             cantidad_producto= detalle_data.cantidad_producto,
