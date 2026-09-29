@@ -2,9 +2,11 @@ import math
 import uuid
 from backend.domain.venta import Venta
 from backend.domain.detalleventa import DetalleVenta
-from backend.schemas.venta_schemas import VentaCreate
+from backend.schemas.venta_schemas import VentaCreate, VentaOut
 from backend.core.exceptions import BusinessRuleError, ConflictError
 from backend.schemas.common import PaginatedResponse
+from backend.schemas.pago_schemas import PagoResponse
+from backend.schemas.detalle_venta_create import DetalleVentaResponse
 from datetime import date
 
 from backend.repositories.productos_repositorio import(
@@ -25,6 +27,29 @@ def calcular_total(venta: Venta):
         total = total + detalle.subtotal
     venta.total = total
     return total
+
+def a_venta_out(venta: Venta):
+    pagos = pago_repositorio.obtener_por_venta(venta.id_venta)
+    ultimo_pago = pagos[-1] if pagos else None
+
+    pago_out = None
+    if ultimo_pago:
+        pago_out = PagoResponse.model_validate(ultimo_pago, from_attributes=True)
+
+    detalles_out = []
+    for d in venta.detalles:
+        detalles_out.append(
+            DetalleVentaResponse.model_validate(d, from_attributes=True)
+        )
+
+    return VentaOut(
+        id_venta= venta.id_venta,
+        fecha_venta= venta.fecha_venta,
+        cliente= venta.cliente,
+        total= venta.total,
+        detalles= detalles_out,
+        pago= pago_out,
+    )
 
 CAMPOS_ORDEN = {"cliente", "total", "fecha_venta"}
 
@@ -67,7 +92,8 @@ def crear_venta(datos: VentaCreate):
     return repo_crear_venta(venta)
 
 def obtener_venta(id_venta: str):
-    return repo_obtener_por_id(id_venta)
+    venta = repo_obtener_por_id(id_venta)
+    return a_venta_out(venta)
 
 def eliminar_venta(id_venta: str):
     obtener_venta(id_venta)
@@ -100,9 +126,10 @@ def listar_venta(cliente: str = None, ordenar_por: str = None, direccion: str = 
     inicio = (pagina - 1) * limite
     fin = inicio + limite
     ventas_pagina = ventas[inicio:fin]
+    items = [a_venta_out(v) for v in ventas_pagina]
 
     return PaginatedResponse(
-        items= ventas_pagina,
+        items= items,
         total= total,
         pagina= pagina,
         limite= limite,
