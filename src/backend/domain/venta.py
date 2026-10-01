@@ -9,5 +9,5 @@ class Venta:
     cliente: str
     fecha_venta: date
     total: float = 0.0
-    detalles: list[DetalleVenta] = field(default_factory=list)
     id_venta: str = field(default_factory=lambda: str(uuid.uuid4()))
+    detalles: list[DetalleVenta] = field(default_factory=list)
