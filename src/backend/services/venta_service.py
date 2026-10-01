@@ -3,7 +3,7 @@ import uuid
 from backend.domain.venta import Venta
 from backend.domain.detalleventa import DetalleVenta
 from backend.schemas.venta_schemas import VentaCreate, VentaOut
-from backend.core.exceptions import BusinessRuleError, ConflictError
+from backend.core.exceptions import BusinessRuleError, ConflictError, ResourceNotFoundError
 from backend.schemas.common import PaginatedResponse
 from backend.schemas.pago_schemas import PagoResponse
 from backend.schemas.detalle_venta_create import DetalleVentaResponse
@@ -63,19 +63,23 @@ def crear_venta(datos: VentaCreate):
     venta = Venta(cliente=datos.cliente, fecha_venta=date.today())
 
     productos_validados = []
+    canntidades_acumuladas = {}
     for detalle_data in datos.detalles:
         if detalle_data.cantidad_producto <= 0:
             raise BusinessRuleError("La cantidad de producto debe ser mayor a cero")
 
         producto = obtener_producto(detalle_data.id_producto)
-        if detalle_data.cantidad_producto > producto.stock:
+        acumulado = canntidades_acumuladas.get(producto.id_producto, 0) + detalle_data.cantidad_producto
+        if acumulado > producto.stock:
             raise BusinessRuleError(
                 f"Stock insuficiente para '{producto.nombre_producto}':"
-                f" Disponible '{producto.stock}', solicitado'{detalle_data.cantidad_producto}'"
+                f" Disponible '{producto.stock}', solicitado'{acumulado}'"
             )
+        canntidades_acumuladas[producto.id_producto] = acumulado
         productos_validados.append((producto, detalle_data))
 
     for producto, detalle_data in productos_validados:
+        producto = obtener_producto(producto.id_producto)
         detalle = DetalleVenta(
             id_detalle= str(uuid.uuid4()),
             id_producto= producto.id_producto,
@@ -96,9 +100,18 @@ def obtener_venta(id_venta: str):
     return a_venta_out(venta)
 
 def eliminar_venta(id_venta: str):
-    obtener_venta(id_venta)
+    venta = repo_obtener_por_id(id_venta)
+
     if pago_repositorio.existe_pago_exitoso(id_venta):
         raise ConflictError("No se puede eliminar una venta que ya fue pagada")
+    for detalle in venta.detalles:
+        try:
+            producto = obtener_producto(detalle.id_producto)
+        except ResourceNotFoundError:
+            producto = None
+        if producto is not None:
+            producto.stock += detalle.cantidad_producto
+            repo_actualizar_producto(producto.id_producto, producto)
     return repo_eliminar_venta(id_venta)
 
 def listar_venta(cliente: str = None, ordenar_por: str = None, direccion: str = "asc",
@@ -110,7 +123,7 @@ def listar_venta(cliente: str = None, ordenar_por: str = None, direccion: str = 
     if cliente:
         ventas_filtradas = []
         for v in ventas:
-            if v.cliente == cliente:
+            if v.cliente.lower() == cliente.lower():
                 ventas_filtradas.append(v)
         ventas = ventas_filtradas
 
