@@ -13,6 +13,10 @@ def procesar_pago(datos: PagoCreate) -> Pago:
 
     if pago_repositorio.existe_pago_exitoso(datos.id_venta):
         raise BusinessRuleError("La venta ya se encuentra pagada")
+    if round(datos.monto, 2) != round(venta.total, 2):
+        raise BusinessRuleError(
+            f"el monto debe ser igual al total de la venta ({venta.total})"
+        )
 
     nuevo_pago = Pago(
         id_pago=str(uuid.uuid4()),
