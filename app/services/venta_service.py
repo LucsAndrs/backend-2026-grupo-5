@@ -9,7 +9,7 @@ from app.schemas.pago_schemas import PagoResponse
 from app.schemas.detalle_venta_create import DetalleVentaResponse
 from datetime import date
 
-from app.repositories.productos_repositorio import producto_repositorio
+from app.repositories.product_repository import product_repository
 from app.repositories.venta_repository import (
     crear_venta as repo_crear_venta,
     obtener_por_id as repo_obtener_por_id,
@@ -65,31 +65,31 @@ def crear_venta(datos: VentaCreate):
         if detalle_data.cantidad_producto <= 0:
             raise BusinessRuleError("La cantidad de producto debe ser mayor a cero")
 
-        producto = producto_repositorio.obtener_por_id(detalle_data.id_producto)
-        acumulado = canntidades_acumuladas.get(producto.id_producto, 0) + detalle_data.cantidad_producto
+        producto = product_repository.get_by_id(detalle_data.id_producto)
+        acumulado = canntidades_acumuladas.get(producto.id, 0) + detalle_data.cantidad_producto
         if acumulado > producto.stock:
             raise BusinessRuleError(
-                f"Stock insuficiente para '{producto.nombre_producto}':"
+                f"Stock insuficiente para '{producto.name}':"
                 f" Disponible '{producto.stock}', solicitado'{acumulado}'"
             )
-        canntidades_acumuladas[producto.id_producto] = acumulado
+        canntidades_acumuladas[producto.id] = acumulado
         productos_validados.append((producto, detalle_data))
 
     for producto, detalle_data in productos_validados:
-        producto = producto_repositorio.obtener_por_id(producto.id_producto)
+        producto = product_repository.get_by_id(producto.id)
         detalle = DetalleVenta(
             id_detalle= str(uuid.uuid4()),
-            id_producto= producto.id_producto,
+            id_producto= producto.id,
             id_venta= venta.id_venta,
             cantidad_producto= detalle_data.cantidad_producto,
-            precio_unitario= producto.precio,
-            subtotal= detalle_data.cantidad_producto * producto.precio,
+            precio_unitario= producto.price,
+            subtotal= detalle_data.cantidad_producto * producto.price,
             iva= 0.0,
             descuento= 0.0,
         )
         agregar_detalle(venta, detalle)
         producto.stock -= detalle_data.cantidad_producto
-        producto_repositorio.actualizar(producto.id_producto, producto)
+        product_repository.update(producto.id, producto)
     return repo_crear_venta(venta)
 
 def obtener_venta(id_venta: str):
@@ -103,12 +103,12 @@ def eliminar_venta(id_venta: str):
         raise ConflictError("No se puede eliminar una venta que ya fue pagada")
     for detalle in venta.detalles:
         try:
-            producto = producto_repositorio.obtener_por_id(detalle.id_producto)
+            producto = product_repository.get_by_id(detalle.id_producto)
         except ResourceNotFoundError:
             producto = None
         if producto is not None:
             producto.stock += detalle.cantidad_producto
-            producto_repositorio.actualizar(producto.id_producto, producto)
+            product_repository.update(producto.id, producto)
     return repo_eliminar_venta(id_venta)
 
 def listar_venta(cliente: str = None, ordenar_por: str = None, direccion: str = "asc",
