@@ -1,8 +1,8 @@
 from typing import Literal, Optional
 from fastapi import APIRouter, Query, status
-from backend.schemas.venta_schemas import VentaCreate, VentaOut
-from backend.schemas.common import PaginatedResponse
-from backend.services.venta_service import(
+from app.schemas.venta_schemas import VentaCreate, VentaOut
+from app.schemas.common import PaginatedResponse
+from app.services.venta_service import(
     crear_venta,
     obtener_venta,
     listar_venta,

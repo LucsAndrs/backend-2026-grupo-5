@@ -1,15 +1,15 @@
 from datetime import datetime
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import Optional
 
 class CategoriaCreate(BaseModel):
-    nombre_categoria: str
-    descripcion: str
+    nombre_categoria: str = Field(max_length=50)
+    descripcion: str = Field(max_length=255)
     activa: bool
 
 class CategoriaPatch(BaseModel):
-    nombre_categoria: Optional[str] = None
-    descripcion: Optional[str] = None
+    nombre_categoria: Optional[str] = Field(default=None, max_length=50)
+    descripcion: Optional[str] = Field(default=None, max_length=255)
     activa: Optional[bool] = None
 
 class CategoriaResponse(BaseModel):
@@ -20,4 +20,3 @@ class CategoriaResponse(BaseModel):
     fecha_creacion: datetime
     fecha_actualizacion: datetime
     cantidad_productos: int
-    

@@ -2,7 +2,7 @@ from dataclasses import dataclass, field
 from datetime import date
 import uuid
 
-from backend.domain.detalleventa import DetalleVenta
+from app.domain.detalleventa import DetalleVenta
 
 @dataclass
 class Venta:

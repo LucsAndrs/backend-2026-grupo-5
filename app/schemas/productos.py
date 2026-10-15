@@ -1,18 +1,18 @@
 from datetime import datetime
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import Optional
 
 class ProductoCreate(BaseModel):
-    nombre_producto: str
-    descripcion: str
+    nombre_producto: str = Field(max_length=50)
+    descripcion: str = Field(max_length=255)
     stock: int
     stock_minimo: int
     id_categoria: str
     precio: int
-    
+
 class ProductoPatch(BaseModel):
-    nombre_producto: Optional[str] = None
-    descripcion: Optional[str] = None
+    nombre_producto: Optional[str] = Field(default=None, max_length=50)
+    descripcion: Optional[str] = Field(default=None, max_length=255)
     stock: Optional[int] = None
     stock_minimo: Optional[int] = None
     id_categoria: Optional[str] = None
@@ -28,4 +28,3 @@ class ProductoResponse(BaseModel):
     precio: int
     fecha_creacion: datetime
     fecha_actualizacion: datetime
-    

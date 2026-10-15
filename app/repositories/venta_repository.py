@@ -1,5 +1,5 @@
-from backend.domain.venta import Venta
-from backend.core.exceptions import ResourceNotFoundError
+from app.domain.venta import Venta
+from app.excepciones import ResourceNotFoundError
 
 ventas: list[Venta] = []
 

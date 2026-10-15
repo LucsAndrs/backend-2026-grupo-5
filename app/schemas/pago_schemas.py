@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field
 from datetime import date
-from backend.domain.pago import EstadoPago
+from app.domain.pago import EstadoPago
 
 #DTO entrada
 class PagoCreate(BaseModel):
