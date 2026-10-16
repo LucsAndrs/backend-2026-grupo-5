@@ -1,7 +1,7 @@
 from typing import List
-from backend.domain.detalleventa import DetalleVenta
-from backend.repositories.venta_repository import obtener_por_id
-from backend.core.exceptions import ResourceNotFoundError
+from app.domain.detalleventa import DetalleVenta
+from app.repositories.venta_repository import obtener_por_id
+from app.excepciones import ResourceNotFoundError
 
 class DetalleVentaService:
     def obtener_detalles_por_venta(self, id_venta: str) -> List[DetalleVenta]:

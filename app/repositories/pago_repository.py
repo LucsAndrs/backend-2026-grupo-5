@@ -1,4 +1,4 @@
-from backend.domain.pago import Pago, EstadoPago
+from app.domain.pago import Pago, EstadoPago
 
 class PagoRepository:
     def __init__(self):

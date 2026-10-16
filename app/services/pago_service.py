@@ -1,11 +1,11 @@
 
 import uuid
 from datetime import date
-from backend.domain.pago import Pago, EstadoPago
-from backend.core.exceptions import ResourceNotFoundError, BusinessRuleError
-from backend.repositories.pago_repository import pago_repositorio
-from backend.repositories.venta_repository import obtener_por_id as obtener_venta_por_id
-from backend.schemas.pago_schemas import PagoCreate
+from app.domain.pago import Pago, EstadoPago
+from app.excepciones import ResourceNotFoundError, BusinessRuleError
+from app.repositories.pago_repository import pago_repositorio
+from app.repositories.venta_repository import obtener_por_id as obtener_venta_por_id
+from app.schemas.pago_schemas import PagoCreate
 
 
 def procesar_pago(datos: PagoCreate) -> Pago:

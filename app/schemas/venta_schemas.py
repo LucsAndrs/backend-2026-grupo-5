@@ -3,8 +3,8 @@ from typing import Optional
 
 from pydantic import BaseModel, Field
 
-from backend.schemas.detalle_venta_create import DetalleVentaCreate, DetalleVentaResponse
-from backend.schemas.pago_schemas import PagoResponse
+from app.schemas.detalle_venta_create import DetalleVentaCreate, DetalleVentaResponse
+from app.schemas.pago_schemas import PagoResponse
 
 class VentaCreate(BaseModel):
     cliente: str = Field(..., min_length=3, max_length=90)
