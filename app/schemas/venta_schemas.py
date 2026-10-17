@@ -3,7 +3,7 @@ from typing import Optional
 
 from pydantic import BaseModel, Field
 
-from app.schemas.detalle_venta_create import DetalleVentaCreate, DetalleVentaResponse
+from app.schemas.detalle_venta_esquema import DetalleVentaCreate, DetalleVentaResponse
 from app.schemas.pago_schemas import PagoRespuesta
 
 class VentaCreada(BaseModel):

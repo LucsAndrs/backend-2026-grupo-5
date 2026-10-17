@@ -3,7 +3,7 @@ from app.domain.detalleventa import DetalleVenta
 from app.repositories.venta_repository import venta_repositorio
 from app.excepciones import ResourceNotFoundError
 
-class DetalleVentaService:
+class DetalleVentaServicio:
     def obtener_detalles_por_venta(self, id_venta: str) -> List[DetalleVenta]:
         venta = venta_repositorio.obtener_por_id(id_venta)
         return venta.detalles
