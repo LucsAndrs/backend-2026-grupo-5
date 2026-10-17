@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from app.schemas.pago_schemas import PagoCreate, PagoResponse
+from app.schemas.pago_schemas import CrearPago, PagoRespuesta
 from app.services.pago_service import procesar_pago, obtener_pago, listar_pagos
 
 

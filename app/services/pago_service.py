@@ -4,12 +4,12 @@ from datetime import date
 from app.domain.pago import Pago, EstadoPago
 from app.excepciones import ResourceNotFoundError, BusinessRuleError
 from app.repositories.pago_repository import pago_repositorio
-from app.repositories.venta_repository import obtener_por_id as obtener_venta_por_id
-from app.schemas.pago_schemas import PagoCreate
+from app.repositories.venta_repository import venta_repositorio
+from app.schemas.pago_schemas import CrearPago
 
 
 def procesar_pago(datos: CrearPago) -> Pago:
-    venta = obtener_venta_por_id(datos.id_venta)
+    venta = venta_repositorio.obtener_por_id(datos.id_venta)
 
     if pago_repositorio.existe_pago_exitoso(datos.id_venta):
         raise BusinessRuleError("La venta ya se encuentra pagada")

@@ -1,6 +1,6 @@
 from app.domain.pago import Pago, EstadoPago
 
-class PagoRepository:
+class PagoRepositorio:
     def __init__(self):
         self._pagos: dict[str, Pago] = {}
     def guardar(self, pago: Pago) -> Pago:
@@ -14,4 +14,4 @@ class PagoRepository:
         return [p for p in self._pagos.values() if p.id_venta == id_venta]
     def existe_pago_exitoso(self, id_venta: str) -> bool:
         return any(p.estado_pago == EstadoPago.EXITOSO for p in self.obtener_por_venta(id_venta))
-pago_repositorio = PagoRepository()
+pago_repositorio = PagoRepositorio()
