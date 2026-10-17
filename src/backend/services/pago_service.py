@@ -5,14 +5,15 @@ from backend.domain.pago import Pago, EstadoPago
 from backend.core.exceptions import ResourceNotFoundError, BusinessRuleError
 from backend.repositories.pago_repository import pago_repositorio
 from backend.repositories.venta_repository import obtener_por_id as obtener_venta_por_id
-from backend.schemas.pago_schemas import PagoCreate
+from backend.schemas.pago_schemas import CrearPago
 
 
-def procesar_pago(datos: PagoCreate) -> Pago:
-    obtener_venta_por_id(datos.id_venta)
+def procesar_pago(datos: CrearPago) -> Pago:
+    venta = obtener_venta_por_id(datos.id_venta)
 
     if pago_repositorio.existe_pago_exitoso(datos.id_venta):
         raise BusinessRuleError("La venta ya se encuentra pagada")
+
     if round(datos.monto, 2) != round(venta.total, 2):
         raise BusinessRuleError(
             f"el monto debe ser igual al total de la venta ({venta.total})"
