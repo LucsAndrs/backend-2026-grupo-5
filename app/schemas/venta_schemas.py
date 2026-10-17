@@ -4,7 +4,7 @@ from typing import Optional
 from pydantic import BaseModel, Field
 
 from app.schemas.detalle_venta_create import DetalleVentaCreate, DetalleVentaResponse
-from app.schemas.pago_schemas import PagoResponse
+from app.schemas.pago_schemas import PagoRespuesta
 
 class VentaCreada(BaseModel):
     cliente: str = Field(..., min_length=3, max_length=90)
@@ -16,4 +16,4 @@ class VentaRespuesta(BaseModel):
     cliente: str
     total: float
     detalles: list[DetalleVentaResponse]
-    pago: Optional[PagoResponse] = None
+    pago: Optional[PagoRespuesta] = None
