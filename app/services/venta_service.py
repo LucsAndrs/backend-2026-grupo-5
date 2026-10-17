@@ -6,7 +6,7 @@ from app.schemas.venta_schemas import VentaCreada, VentaRespuesta
 from app.excepciones import BusinessRuleError, ConflictError, ResourceNotFoundError
 from app.schemas.common import PaginatedResponse
 from app.schemas.pago_schemas import PagoRespuesta
-from app.schemas.detalle_venta_create import DetalleVentaResponse
+from app.schemas.detalle_venta_esquema import DetalleVentaResponse
 from datetime import date
 
 from app.repositories.productos_repositorio import producto_repositorio
