@@ -4,15 +4,20 @@ from datetime import date
 from app.domain.pago import Pago, EstadoPago
 from app.excepciones import ResourceNotFoundError, BusinessRuleError
 from app.repositories.pago_repository import pago_repositorio
-from app.repositories.venta_repository import obtener_por_id as obtener_venta_por_id
-from app.schemas.pago_schemas import PagoCreate
+from app.repositories.venta_repository import venta_repositorio
+from app.schemas.pago_schemas import CrearPago
 
 
-def procesar_pago(datos: PagoCreate) -> Pago:
-    obtener_venta_por_id(datos.id_venta)
+def procesar_pago(datos: CrearPago) -> Pago:
+    venta = venta_repositorio.obtener_por_id(datos.id_venta)
 
     if pago_repositorio.existe_pago_exitoso(datos.id_venta):
         raise BusinessRuleError("La venta ya se encuentra pagada")
+
+    if round(datos.monto, 2) != round(venta.total, 2):
+        raise BusinessRuleError(
+            f"el monto debe ser igual al total de la venta ({venta.total})"
+        )
 
     nuevo_pago = Pago(
         id_pago=str(uuid.uuid4()),
