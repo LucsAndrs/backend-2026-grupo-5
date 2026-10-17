@@ -5,7 +5,7 @@ from app.domain.detalleventa import DetalleVenta
 from app.schemas.venta_schemas import VentaCreada, VentaRespuesta
 from app.excepciones import BusinessRuleError, ConflictError, ResourceNotFoundError
 from app.schemas.common import PaginatedResponse
-from app.schemas.pago_schemas import PagoResponse
+from app.schemas.pago_schemas import PagoRespuesta
 from app.schemas.detalle_venta_create import DetalleVentaResponse
 from datetime import date
 
@@ -30,7 +30,7 @@ class VentaServicio:
 
         pago_out = None
         if ultimo_pago:
-            pago_out = PagoResponse.model_validate(ultimo_pago, from_attributes=True)
+            pago_out = PagoRespuesta.model_validate(ultimo_pago, from_attributes=True)
 
         detalles_out = []
         for d in venta.detalles:
