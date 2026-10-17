@@ -1,10 +1,10 @@
 from pydantic import BaseModel
 
-class DetalleVentaCreate(BaseModel):
+class DetalleVentaCrear(BaseModel):
     id_producto: str
     cantidad_producto: int
 
-class DetalleVentaResponse(BaseModel):
+class DetalleVentaRespuesta(BaseModel):
     id_detalle: str
     id_producto: str
     cantidad_producto: int

@@ -1,10 +1,10 @@
 from fastapi import APIRouter
 from typing import List
 from app.domain.detalleventa import DetalleVenta
-from app.services.detalle_venta_service import DetalleVentaService
+from app.services.detalle_venta_service import DetalleVentaServicio
 
 router = APIRouter(prefix="/ventas", tags=["Detalles de Venta"])
-service = DetalleVentaService()
+service = DetalleVentaServicio()
 
 
 @router.get("/{id_venta}/detalles", response_model=List[DetalleVenta])
