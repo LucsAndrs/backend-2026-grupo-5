@@ -5,11 +5,11 @@ from app.domain.detalleventa import DetalleVenta
 from app.schemas.venta_schemas import VentaCreada, VentaRespuesta
 from app.excepciones import BusinessRuleError, ConflictError, ResourceNotFoundError
 from app.schemas.common import PaginatedResponse
-from app.schemas.pago_schemas import PagoResponse
+from app.schemas.pago_schemas import PagoRespuesta
 from app.schemas.detalle_venta_create import DetalleVentaResponse
 from datetime import date
 
-from app.repositories.product_repository import product_repository
+from app.repositories.productos_repositorio import producto_repositorio
 from app.repositories.venta_repository import venta_repositorio
 from app.repositories.pago_repository import pago_repositorio
 
@@ -30,7 +30,7 @@ class VentaServicio:
 
         pago_out = None
         if ultimo_pago:
-            pago_out = PagoResponse.model_validate(ultimo_pago, from_attributes=True)
+            pago_out = PagoRespuesta.model_validate(ultimo_pago, from_attributes=True)
 
         detalles_out = []
         for d in venta.detalles:
@@ -63,32 +63,32 @@ class VentaServicio:
             if detalle_data.cantidad_producto <= 0:
                 raise BusinessRuleError("La cantidad de producto debe ser mayor a cero")
 
-            producto = product_repository.get_by_id(detalle_data.id_producto)
-            acumulado = canntidades_acumuladas.get(producto.id, 0) + detalle_data.cantidad_producto
+            producto = producto_repositorio.obtener_por_id(detalle_data.id_producto)
+            acumulado = canntidades_acumuladas.get(producto.id_producto, 0) + detalle_data.cantidad_producto
 
             if acumulado > producto.stock:
                 raise BusinessRuleError(
-                    f"Stock insuficiente para '{producto.name}':"
+                    f"Stock insuficiente para '{producto.nombre_producto}':"
                     f" Disponible '{producto.stock}', solicitado'{acumulado}'"
                 )
-            canntidades_acumuladas[producto.id] = acumulado
+            canntidades_acumuladas[producto.id_producto] = acumulado
             productos_validados.append((producto, detalle_data))
 
         for producto, detalle_data in productos_validados:
-            producto = product_repository.get_by_id(producto.id)
+            producto = producto_repositorio.obtener_por_id(producto.id_producto)
             detalle = DetalleVenta(
                 id_detalle= str(uuid.uuid4()),
-                id_producto= producto.id,
+                id_producto= producto.id_producto,
                 id_venta= venta.id_venta,
                 cantidad_producto= detalle_data.cantidad_producto,
-                precio_unitario= producto.price,
-                subtotal= detalle_data.cantidad_producto * producto.price,
+                precio_unitario= producto.precio,
+                subtotal= detalle_data.cantidad_producto * producto.precio,
                 iva= 0.0,
                 descuento= 0.0,
             )
             self.agregar_detalle(venta, detalle)
             producto.stock -= detalle_data.cantidad_producto
-            product_repository.update(producto.id, producto)
+            producto_repositorio.actualizar(producto.id_producto, producto)
 
         venta_guardada = venta_repositorio.crear_venta(venta)
         return self.a_venta_out(venta_guardada)
@@ -105,13 +105,13 @@ class VentaServicio:
 
         for detalle in venta.detalles:
             try:
-                producto = product_repository.get_by_id(detalle.id_producto)
+                producto = producto_repositorio.obtener_por_id(detalle.id_producto)
             except ResourceNotFoundError:
                 producto = None
-                
+
             if producto is not None:
                 producto.stock += detalle.cantidad_producto
-                product_repository.update(producto.id, producto)
+                producto_repositorio.actualizar(producto.id_producto, producto)
 
         return venta_repositorio.eliminar_venta(id_venta)
 
