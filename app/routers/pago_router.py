@@ -1,6 +1,7 @@
 from fastapi import APIRouter
-from backend.schemas.pago_schemas import CrearPago, PagoRespuesta
-from backend.services.pago_service import procesar_pago, obtener_pago, listar_pagos
+from app.schemas.pago_schemas import PagoCreate, PagoResponse
+from app.services.pago_service import procesar_pago, obtener_pago, listar_pagos
+
 
 router = APIRouter(prefix="/pagos", tags=["pagos"])
 

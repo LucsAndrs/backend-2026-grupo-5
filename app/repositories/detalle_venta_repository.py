@@ -1,6 +1,6 @@
-from backend.domain.detalleventa import DetalleVenta
+from app.domain.detalleventa import DetalleVenta
 from typing import List, Optional
-from backend.repositories.venta_repository import obtener_por_id
+from app.repositories.venta_repository import obtener_por_id
 
 class DetalleVentaRepository:
     def obtener_todos_de_una_venta(self, id_venta: str) -> List[DetalleVenta]:
