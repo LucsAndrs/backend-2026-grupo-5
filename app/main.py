@@ -46,6 +46,6 @@ app.include_router(detalle_venta_router)
 app.include_router(pago_router)
 
 from .base_datos import Base, motor
-from .models import categoria_bd, producto_bd
+from .models import categoria_bd, producto_bd, venta_bd
 
 Base.metadata.create_all(bind=motor)
