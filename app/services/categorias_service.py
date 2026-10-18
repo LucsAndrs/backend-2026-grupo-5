@@ -3,7 +3,7 @@ import math
 from sqlalchemy.orm import Session
 from ..excepciones import BusinessRuleError
 from ..domain.categorias import Categoria
-from ..schemas.categorias import CategoriaCreate, CategoriaPatch, CategoriaResponse
+from ..schemas.categorias_schemas import CategoriaCreate, CategoriaPatch, CategoriaResponse
 from ..schemas.common import PaginatedResponse
 from ..repositories.categorias_repositorio import categoria_repositorio
 from ..repositories.productos_repositorio import producto_repositorio

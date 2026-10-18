@@ -2,7 +2,7 @@ from typing import Literal
 from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy.orm import Session
 from ..base_datos import obtener_bd
-from ..schemas.productos import ProductoCreate, ProductoPatch, ProductoResponse
+from ..schemas.productos_schemas import ProductoCreate, ProductoPatch, ProductoResponse
 from ..domain.productos import Producto
 from ..schemas.common import PaginatedResponse
 from ..services.productos_service import producto_service

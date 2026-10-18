@@ -2,7 +2,7 @@ from typing import Literal
 from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy.orm import Session
 from ..base_datos import obtener_bd
-from ..schemas.categorias import CategoriaCreate, CategoriaPatch, CategoriaResponse
+from ..schemas.categorias_schemas import CategoriaCreate, CategoriaPatch, CategoriaResponse
 from ..domain.categorias import Categoria
 from ..schemas.common import PaginatedResponse
 from ..services.categorias_service import categoria_service
