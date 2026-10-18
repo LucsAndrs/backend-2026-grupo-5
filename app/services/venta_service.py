@@ -1,13 +1,15 @@
 import math
 import uuid
+from datetime import date
+from sqlalchemy.orm import Session
+
 from app.domain.venta import Venta
 from app.domain.detalleventa import DetalleVenta
 from app.schemas.venta_schemas import VentaCreada, VentaRespuesta
 from app.excepciones import BusinessRuleError, ConflictError, ResourceNotFoundError
 from app.schemas.common import PaginatedResponse
 from app.schemas.pago_schemas import PagoRespuesta
-from app.schemas.detalle_venta_esquema import DetalleVentaResponse
-from datetime import date
+from app.schemas.detalle_venta_esquema import DetalleVentaRespuesta
 
 from app.repositories.productos_repositorio import producto_repositorio
 from app.repositories.venta_repository import venta_repositorio
@@ -35,7 +37,7 @@ class VentaServicio:
         detalles_out = []
         for d in venta.detalles:
             detalles_out.append(
-                DetalleVentaResponse.model_validate(d, from_attributes=True)
+                DetalleVentaRespuesta.model_validate(d, from_attributes=True)
             )
 
         return VentaRespuesta(
@@ -53,7 +55,7 @@ class VentaServicio:
         venta.detalles.append(detalle)
         self.calcular_total(venta)
 
-    def crear_venta(self, datos: VentaCreada):
+    def crear_venta(self, bd: Session, datos: VentaCreada):
         venta = Venta(cliente=datos.cliente, fecha_venta=date.today())
 
         productos_validados = []
@@ -90,16 +92,18 @@ class VentaServicio:
             producto.stock -= detalle_data.cantidad_producto
             producto_repositorio.actualizar(producto.id_producto, producto)
 
-        venta_guardada = venta_repositorio.crear_venta(venta)
+        venta_guardada = venta_repositorio.crear_venta(bd, venta)
         return self.a_venta_out(venta_guardada)
 
-    def obtener_venta(self, id_venta: str):
-        venta = venta_repositorio.obtener_por_id(id_venta)
+    def obtener_venta(self, bd: Session, id_venta: str):
+        venta = venta_repositorio.obtener_por_id(bd, id_venta)
         return self.a_venta_out(venta)
 
-    def eliminar_venta(self, id_venta: str):
-        venta = venta_repositorio.obtener_por_id(id_venta)
+    def eliminar_venta(self, bd: Session, id_venta: str):
+        venta = venta_repositorio.obtener_por_id(bd, id_venta)
 
+    # TODO: Cuando Nico migre 'Pago' a base de datos, descomentar la siguiente línea:
+        # if pago_repositorio.existe_pago_exitoso(bd, id_venta):
         if pago_repositorio.existe_pago_exitoso(id_venta):
             raise ConflictError("No se puede eliminar una venta que ya fue pagada")
 
@@ -113,13 +117,13 @@ class VentaServicio:
                 producto.stock += detalle.cantidad_producto
                 producto_repositorio.actualizar(producto.id_producto, producto)
 
-        return venta_repositorio.eliminar_venta(id_venta)
+        return venta_repositorio.eliminar_venta(bd, id_venta)
 
-    def listar_venta(self, cliente: str = None, ordenar_por: str = None, direccion: str = "asc",
+    def listar_venta(self, bd: Session, cliente: str = None, ordenar_por: str = None, direccion: str = "asc",
                     pagina: int = 1, limite: int = 20):
         if ordenar_por is not None and ordenar_por not in self.CAMPOS_ORDEN:
             raise BusinessRuleError(f"El campo '{ordenar_por}' no es valido para ordenar")
-        ventas = venta_repositorio.listar_todas()
+        ventas = venta_repositorio.listar_todas(bd)
 
         if cliente:
             ventas_filtradas = []
@@ -151,8 +155,8 @@ class VentaServicio:
             total_paginas= total_paginas,
         )
 
-    def generar_boleta(self, id_venta: str):
-        venta = venta_repositorio.obtener_por_id(id_venta)
+    def generar_boleta(self, bd: Session, id_venta: str):
+        venta = venta_repositorio.obtener_por_id(bd, id_venta)
         items = []
         for detalle in venta.detalles:
             items.append({
