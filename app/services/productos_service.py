@@ -1,5 +1,6 @@
 from datetime import datetime
 import math
+from sqlalchemy.orm import Session
 from ..excepciones import BusinessRuleError
 from ..domain.productos import Producto
 from ..schemas.productos import ProductoCreate, ProductoPatch, ProductoResponse
@@ -25,12 +26,13 @@ class ProductoService:
             fecha_actualizacion=producto.fecha_actualizacion,
         )
 
-    def crear(self, datos: ProductoCreate) -> Producto:
-        categoria_repositorio.obtener_por_id(datos.id_categoria)
+    def crear(self, bd: Session, datos: ProductoCreate) -> Producto:
+        categoria_repositorio.obtener_por_id(bd, datos.id_categoria)
         entidad = Producto(**datos.model_dump())
-        return producto_repositorio.crear(entidad)
+        return producto_repositorio.crear(bd, entidad)
 
     def obtener_productos(self,
+                          bd: Session,
                           id_categoria: str | None = None,
                           nombre: str | None = None,
                           ordenar_por: str = "nombre_producto",
@@ -40,7 +42,7 @@ class ProductoService:
         if ordenar_por not in CAMPOS_ORDEN:
             raise BusinessRuleError(f"El campo '{ordenar_por}' no es válido para ordenar")
 
-        filtrados = producto_repositorio.obtener_todos()
+        filtrados = producto_repositorio.obtener_todos(bd)
         if id_categoria is not None:
             filtrados = [p for p in filtrados if p.id_categoria == id_categoria]
         if nombre:
@@ -57,11 +59,11 @@ class ProductoService:
         return PaginatedResponse(items=items, total=total, pagina=pagina,
                                  limite=limite, total_paginas=total_paginas)
 
-    def obtener_por_id(self, id_producto: str) -> ProductoResponse:
-        return self._a_producto_response(producto_repositorio.obtener_por_id(id_producto))
+    def obtener_por_id(self, bd: Session, id_producto: str) -> ProductoResponse:
+        return self._a_producto_response(producto_repositorio.obtener_por_id(bd, id_producto))
 
-    def actualizar(self, id_producto: str, datos: ProductoPatch) -> ProductoResponse:
-        entidad = producto_repositorio.obtener_por_id(id_producto)
+    def actualizar(self, bd: Session, id_producto: str, datos: ProductoPatch) -> ProductoResponse:
+        entidad = producto_repositorio.obtener_por_id(bd, id_producto)
         if datos.nombre_producto is not None:
             entidad.nombre_producto = datos.nombre_producto
         if datos.descripcion is not None:
@@ -71,15 +73,15 @@ class ProductoService:
         if datos.stock_minimo is not None:
             entidad.stock_minimo = datos.stock_minimo
         if datos.id_categoria is not None:
-            categoria_repositorio.obtener_por_id(datos.id_categoria)
+            categoria_repositorio.obtener_por_id(bd, datos.id_categoria)
             entidad.id_categoria = datos.id_categoria
         if datos.precio is not None:
             entidad.precio = datos.precio
         entidad.fecha_actualizacion = datetime.now()
-        return self._a_producto_response(producto_repositorio.actualizar(id_producto, entidad))
+        return self._a_producto_response(producto_repositorio.actualizar(bd, id_producto, entidad))
 
-    def eliminar(self, id_producto: str) -> None:
-        return producto_repositorio.eliminar(id_producto)
+    def eliminar(self, bd: Session, id_producto: str) -> None:
+        return producto_repositorio.eliminar(bd, id_producto)
 
 
 producto_service = ProductoService()
