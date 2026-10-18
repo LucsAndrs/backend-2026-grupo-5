@@ -8,7 +8,7 @@ class VentaBD(Base):
     id_venta = Column(String, primary_key=True, index=True)
     cliente = Column(String, nullable=False)
     fecha_venta = Column(Date, nullable=False)
-    total = Column(Float=0.0)
+    total = Column(Float, default=0.0)
 
 
     detalles = relationship("DetalleVentaBD", back_populates="venta", cascade="all, delete-orphan")

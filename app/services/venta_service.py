@@ -102,6 +102,8 @@ class VentaServicio:
     def eliminar_venta(self, bd: Session, id_venta: str):
         venta = venta_repositorio.obtener_por_id(bd, id_venta)
 
+    # TODO: Cuando Nico migre 'Pago' a base de datos, descomentar la siguiente línea:
+        # if pago_repositorio.existe_pago_exitoso(bd, id_venta):
         if pago_repositorio.existe_pago_exitoso(id_venta):
             raise ConflictError("No se puede eliminar una venta que ya fue pagada")
 
