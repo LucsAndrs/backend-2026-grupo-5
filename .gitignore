@@ -7,3 +7,5 @@ env/
 .env
 *.pyc
 .venv/
+minimarket.db
+*.db

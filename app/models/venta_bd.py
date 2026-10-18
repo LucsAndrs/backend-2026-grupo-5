@@ -10,5 +10,5 @@ class VentaBD(Base):
     fecha_venta = Column(Date, nullable=False)
     total = Column(Float, default=0.0)
 
-
-    detalles = relationship("DetalleVentaBD", back_populates="venta", cascade="all, delete-orphan")
+    # Desactivada hasta que exista DetalleVentaBD (bloquea configure_mappers de todas las tablas)
+    # detalles = relationship("DetalleVentaBD", back_populates="venta", cascade="all, delete-orphan")

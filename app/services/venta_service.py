@@ -65,7 +65,7 @@ class VentaServicio:
             if detalle_data.cantidad_producto <= 0:
                 raise BusinessRuleError("La cantidad de producto debe ser mayor a cero")
 
-            producto = producto_repositorio.obtener_por_id(detalle_data.id_producto)
+            producto = producto_repositorio.obtener_por_id(bd, detalle_data.id_producto)
             acumulado = canntidades_acumuladas.get(producto.id_producto, 0) + detalle_data.cantidad_producto
 
             if acumulado > producto.stock:
@@ -77,7 +77,7 @@ class VentaServicio:
             productos_validados.append((producto, detalle_data))
 
         for producto, detalle_data in productos_validados:
-            producto = producto_repositorio.obtener_por_id(producto.id_producto)
+            producto = producto_repositorio.obtener_por_id(bd, producto.id_producto)
             detalle = DetalleVenta(
                 id_detalle= str(uuid.uuid4()),
                 id_producto= producto.id_producto,
@@ -90,7 +90,7 @@ class VentaServicio:
             )
             self.agregar_detalle(venta, detalle)
             producto.stock -= detalle_data.cantidad_producto
-            producto_repositorio.actualizar(producto.id_producto, producto)
+            producto_repositorio.actualizar(bd, producto.id_producto, producto)
 
         venta_guardada = venta_repositorio.crear_venta(bd, venta)
         return self.a_venta_out(venta_guardada)
@@ -109,13 +109,13 @@ class VentaServicio:
 
         for detalle in venta.detalles:
             try:
-                producto = producto_repositorio.obtener_por_id(detalle.id_producto)
+                producto = producto_repositorio.obtener_por_id(bd, detalle.id_producto)
             except ResourceNotFoundError:
                 producto = None
 
             if producto is not None:
                 producto.stock += detalle.cantidad_producto
-                producto_repositorio.actualizar(producto.id_producto, producto)
+                producto_repositorio.actualizar(bd, producto.id_producto, producto)
 
         return venta_repositorio.eliminar_venta(bd, id_venta)
 
