@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 
 from app.domain.venta import Venta
 from app.domain.detalleventa import DetalleVenta
-from app.schemas.venta_schemas import VentaCreada, VentaRespuesta
+from app.schemas.venta_esquemas import VentaCreada, VentaRespuesta
 from app.excepciones import BusinessRuleError, ConflictError, ResourceNotFoundError
 from app.schemas.common import PaginatedResponse
 from app.schemas.pago_schemas import PagoRespuesta
