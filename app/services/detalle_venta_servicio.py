@@ -1,6 +1,6 @@
 from typing import List
 from app.domain.detalleventa import DetalleVenta
-from app.repositories.venta_repository import venta_repositorio
+from app.repositories.venta_repositorio import venta_repositorio
 from app.excepciones import ResourceNotFoundError
 
 class DetalleVentaServicio:

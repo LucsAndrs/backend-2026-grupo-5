@@ -5,14 +5,14 @@ from sqlalchemy.orm import Session
 
 from app.domain.venta import Venta
 from app.domain.detalleventa import DetalleVenta
-from app.schemas.venta_schemas import VentaCreada, VentaRespuesta
+from app.schemas.venta_esquemas import VentaCreada, VentaRespuesta
 from app.excepciones import BusinessRuleError, ConflictError, ResourceNotFoundError
 from app.schemas.common import PaginatedResponse
 from app.schemas.pago_schemas import PagoRespuesta
 from app.schemas.detalle_venta_esquema import DetalleVentaRespuesta
 
 from app.repositories.productos_repositorio import producto_repositorio
-from app.repositories.venta_repository import venta_repositorio
+from app.repositories.venta_repositorio import venta_repositorio
 from app.repositories.pago_repository import pago_repositorio
 
 class VentaServicio:

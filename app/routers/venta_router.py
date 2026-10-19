@@ -2,9 +2,9 @@ from typing import Literal, Optional
 from fastapi import APIRouter, Query, status, Depends
 from sqlalchemy.orm import Session
 
-from app.schemas.venta_schemas import VentaCreada, VentaRespuesta
+from app.schemas.venta_esquemas import VentaCreada, VentaRespuesta
 from app.schemas.common import PaginatedResponse
-from app.services.venta_service import venta_servicio
+from app.services.venta_servicio import venta_servicio
 from app.base_datos import obtener_bd
 
 router = APIRouter(prefix="/ventas", tags=["Ventas"])

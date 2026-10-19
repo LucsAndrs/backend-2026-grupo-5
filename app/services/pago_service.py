@@ -4,7 +4,7 @@ from datetime import date
 from app.domain.pago import Pago, EstadoPago
 from app.excepciones import ResourceNotFoundError, BusinessRuleError
 from app.repositories.pago_repository import pago_repositorio
-from app.repositories.venta_repository import venta_repositorio
+from app.repositories.venta_repositorio import venta_repositorio
 from app.schemas.pago_schemas import CrearPago
 
 
