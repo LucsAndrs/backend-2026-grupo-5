@@ -1,4 +1,5 @@
 from sqlalchemy import Column, String, Boolean, DateTime
+from sqlalchemy.orm import relationship
 from app.base_datos import Base
 
 
@@ -11,3 +12,5 @@ class CategoriaBD(Base):
     activa = Column(Boolean, nullable=False, default=True)
     fecha_creacion = Column(DateTime, nullable=False)
     fecha_actualizacion = Column(DateTime, nullable=False)
+
+    productos = relationship("ProductoBD", back_populates="categoria")

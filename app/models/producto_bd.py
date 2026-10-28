@@ -1,6 +1,6 @@
 from sqlalchemy import Column, String, Integer, DateTime, ForeignKey
+from sqlalchemy.orm import relationship
 from app.base_datos import Base
-
 
 class ProductoBD(Base):
     __tablename__ = "productos"
@@ -14,3 +14,5 @@ class ProductoBD(Base):
     precio = Column(Integer, nullable=False)
     fecha_creacion = Column(DateTime, nullable=False)
     fecha_actualizacion = Column(DateTime, nullable=False)
+    
+    categoria = relationship("CategoriaBD", back_populates="productos")
