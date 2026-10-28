@@ -26,8 +26,8 @@ class VentaServicio:
         venta.total = total
         return total
 
-    def a_venta_out(self, venta: Venta) -> VentaRespuesta:
-        pagos = pago_repositorio.obtener_por_venta(venta.id_venta)
+    def a_venta_out(self,bd:Session, venta: Venta) -> VentaRespuesta:
+        pagos = pago_repositorio.obtener_por_venta(bd, venta.id_venta)
         ultimo_pago = pagos[-1] if pagos else None
 
         pago_out = None
@@ -93,18 +93,17 @@ class VentaServicio:
             producto_repositorio.actualizar(bd, producto.id_producto, producto)
 
         venta_guardada = venta_repositorio.crear_venta(bd, venta)
-        return self.a_venta_out(venta_guardada)
+        return self.a_venta_out(bd, venta_guardada)
 
     def obtener_venta(self, bd: Session, id_venta: str):
         venta = venta_repositorio.obtener_por_id(bd, id_venta)
-        return self.a_venta_out(venta)
+        return self.a_venta_out(bd, venta)
 
     def eliminar_venta(self, bd: Session, id_venta: str):
         venta = venta_repositorio.obtener_por_id(bd, id_venta)
 
-    # TODO: Cuando Nico migre 'Pago' a base de datos, descomentar la siguiente línea:
-        # if pago_repositorio.existe_pago_exitoso(bd, id_venta):
-        if pago_repositorio.existe_pago_exitoso(id_venta):
+    # TODO: 
+        if pago_repositorio.existe_pago_exitoso(bd, id_venta):
             raise ConflictError("No se puede eliminar una venta que ya fue pagada")
 
         for detalle in venta.detalles:
@@ -145,7 +144,7 @@ class VentaServicio:
         inicio = (pagina - 1) * limite
         fin = inicio + limite
         ventas_pagina = ventas[inicio:fin]
-        items = [self.a_venta_out(v) for v in ventas_pagina]
+        items = [self.a_venta_out(bd, v) for v in ventas_pagina]
 
         return PaginatedResponse(
             items= items,

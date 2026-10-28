@@ -9,6 +9,7 @@ from .routers.pago_router import router as pago_router
 from .routers.detalle_venta_ruta import router as detalle_venta_router
 from .schemas.common import ErrorDetail, ErrorResponse
 
+
 app = FastAPI()
 
 def _envelope(code: str, message: str, details: list[str]) -> dict:
@@ -46,6 +47,6 @@ app.include_router(detalle_venta_router)
 app.include_router(pago_router)
 
 from .base_datos import Base, motor
-from .models import categoria_bd, producto_bd, venta_bd
+from .models import categoria_bd, producto_bd, venta_bd, pago_bd
 
 Base.metadata.create_all(bind=motor)
