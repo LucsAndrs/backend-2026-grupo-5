@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 
 from app.base_datos import obtener_bd
 from app.schemas.pago_schemas import CrearPago, PagoRespuesta
-from app.services.pago_service import (
+from app.services.pago_servicio import (
     listar_pagos,
     obtener_pago,
     procesar_pago,

@@ -13,7 +13,7 @@ from app.schemas.detalle_venta_esquema import DetalleVentaRespuesta
 
 from app.repositories.productos_repositorio import producto_repositorio
 from app.repositories.venta_repositorio import venta_repositorio
-from app.repositories.pago_repository import pago_repositorio
+from app.repositories.pago_repositorio import pago_repositorio
 
 class VentaServicio:
     def __init__(self):

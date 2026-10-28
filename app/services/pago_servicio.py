@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 
 from app.domain.pago import EstadoPago, Pago
 from app.excepciones import BusinessRuleError, ResourceNotFoundError
-from app.repositories.pago_repository import pago_repositorio
+from app.repositories.pago_repositorio import pago_repositorio
 from app.repositories.venta_repositorio import venta_repositorio
 from app.schemas.pago_schemas import CrearPago
 

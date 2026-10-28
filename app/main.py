@@ -5,7 +5,7 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from .excepciones import ApiError
 from .routers import categorias_routers, productos_routers, venta_router
-from .routers.pago_router import router as pago_router
+from .routers.pago_ruta import router as pago_router
 from .routers.detalle_venta_ruta import router as detalle_venta_router
 from .schemas.common import ErrorDetail, ErrorResponse
 
