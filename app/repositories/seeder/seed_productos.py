@@ -2,8 +2,8 @@ from datetime import datetime
 
 from sqlalchemy.orm import Session
 
-from app.models.categoria_bd import CategoriaBD
-from app.models.producto_bd import ProductoBD
+from app.models.categoria_modelos import CategoriaBD
+from app.models.producto_modelos import ProductoBD
 
 
 PRODUCTOS = [

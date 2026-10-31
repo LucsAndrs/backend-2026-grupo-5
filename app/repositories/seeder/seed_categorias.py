@@ -4,7 +4,7 @@ from datetime import datetime
 
 from sqlalchemy.orm import Session
 
-from app.models.categoria_bd import CategoriaBD
+from app.models.categoria_modelos import CategoriaBD
 
 
 CATEGORIAS = [

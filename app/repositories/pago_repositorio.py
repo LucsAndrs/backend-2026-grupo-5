@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 
 from app.domain.pago import EstadoPago, Pago
-from app.models.pago_bd import PagoBD
+from app.models.pago_modelos import PagoBD
 
 
 class PagoRepositorio:

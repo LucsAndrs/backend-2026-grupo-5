@@ -1,8 +1,8 @@
 from sqlalchemy.orm import Session
 
-from app.models.detalle_venta_db import DetalleVentaBD
-from app.models.producto_bd import ProductoBD
-from app.models.venta_bd import VentaBD
+from app.models.detalle_venta_modelos import DetalleVentaBD
+from app.models.producto_modelos import ProductoBD
+from app.models.venta_modelos import VentaBD
 
 
 DETALLES = [

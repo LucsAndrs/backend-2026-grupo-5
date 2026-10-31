@@ -2,7 +2,7 @@ from datetime import date
 
 from sqlalchemy.orm import Session
 
-from app.models.venta_bd import VentaBD
+from app.models.venta_modelos import VentaBD
 
 
 VENTAS = [

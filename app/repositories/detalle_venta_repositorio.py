@@ -2,7 +2,7 @@ from app.domain.detalleventa import DetalleVenta
 from typing import List
 from sqlalchemy.orm import Session
 from app.excepciones import ResourceNotFoundError
-from app.models.detalle_venta_db import DetalleVentaBD
+from app.models.detalle_venta_modelos import DetalleVentaBD
 
 class DetalleVentaRepositorio:
     def obtener_todos_de_una_venta(

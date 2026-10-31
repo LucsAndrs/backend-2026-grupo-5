@@ -2,7 +2,7 @@ from sqlalchemy import func
 from sqlalchemy.orm import Session
 from ..excepciones import ConflictError, ResourceNotFoundError
 from ..domain.productos import Producto
-from ..models.producto_bd import ProductoBD
+from ..models.producto_modelos import ProductoBD
 
 
 class ProductoRepositorio:

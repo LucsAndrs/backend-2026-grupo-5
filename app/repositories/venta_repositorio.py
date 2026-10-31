@@ -2,8 +2,8 @@ from sqlalchemy.orm import Session
 from app.domain.venta import Venta
 from app.domain.detalleventa import DetalleVenta
 from app.excepciones import ResourceNotFoundError
-from app.models.venta_bd import VentaBD
-from app.models.detalle_venta_db import DetalleVentaBD
+from app.models.venta_modelos import VentaBD
+from app.models.detalle_venta_modelos import DetalleVentaBD
 
 class VentaRepositorio:
     def crear_venta(self, bd: Session, venta: Venta) -> Venta:

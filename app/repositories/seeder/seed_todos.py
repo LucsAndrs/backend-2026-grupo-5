@@ -3,7 +3,7 @@ python -m app.repositories.seeder.seed_todos
 """
 
 from app.base_datos import Base, SesionLocal, motor
-from app.models import categoria_bd, detalle_venta_db, pago_bd, producto_bd, venta_bd
+from app.models import categoria_modelos, detalle_venta_modelos, pago_modelos, producto_modelos, venta_modelos
 from app.repositories.seeder.seed_categorias import seedear_categorias
 from app.repositories.seeder.seed_detalles_ventas import seedear_detalles_ventas
 from app.repositories.seeder.seed_pagos import seedear_pagos
