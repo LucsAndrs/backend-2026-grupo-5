@@ -7,7 +7,7 @@ from ..domain.categorias import Categoria
 from ..schemas.common import PaginatedResponse
 from ..services.categorias_service import categoria_service
 
-router = APIRouter(prefix="/categorias")
+router = APIRouter(prefix="/categorias", tags=["Categorias"])
 
 
 @router.post("/", response_model=Categoria, status_code=status.HTTP_201_CREATED)

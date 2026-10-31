@@ -1,0 +1,1361 @@
+Fecha: 2026-10-31T20:22:05-03:00
+
+Base de datos aislada: /tmp/minimarket_pruebas_WNx0i2.db
+URL base: http://127.0.0.1:38791
+
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade  -> d558a2aa70ae, crear esquema inicial
+
+---------------------
+
+=== crearCategoriaCrud ===
+
+POST http://127.0.0.1:38791/categorias/
+accept-encoding: gzip, deflate, br
+accept: */*
+content-length: 116
+content-type: application/json
+user-agent: httpyac
+
+{
+  "nombre_categoria": "Categoria CRUD 1793488939084",
+  "descripcion": "Creada para el caso 1",
+  "activa": true
+}
+HTTP/1.1 201  - Created
+content-length: 254
+content-type: application/json
+date: Sat, 31 Oct 2026 23:22:18 GMT
+server: uvicorn
+
+{
+  "nombre_categoria": "Categoria CRUD 1793488939084",
+  "descripcion": "Creada para el caso 1",
+  "activa": true,
+  "fecha_creacion": "2026-10-31T20:22:19.473059",
+  "fecha_actualizacion": "2026-10-31T20:22:19.473067",
+  "id_categoria": "09afcb27-791e-4bad-8724-2eaa638efe53"
+}
+✓ status == 201
+✓ id_categoria exists
+✓ nombre_categoria contains CRUD
+
+---------------------
+
+=== obtenerCategoriaCrud ===
+
+GET http://127.0.0.1:38791/categorias/09afcb27-791e-4bad-8724-2eaa638efe53
+accept-encoding: gzip, deflate, br
+accept: */*
+user-agent: httpyac
+HTTP/1.1 200  - OK
+content-length: 277
+content-type: application/json
+date: Sat, 31 Oct 2026 23:22:18 GMT
+server: uvicorn
+
+{
+  "id_categoria": "09afcb27-791e-4bad-8724-2eaa638efe53",
+  "nombre_categoria": "Categoria CRUD 1793488939084",
+  "descripcion": "Creada para el caso 1",
+  "activa": true,
+  "fecha_creacion": "2026-10-31T20:22:19.473059",
+  "fecha_actualizacion": "2026-10-31T20:22:19.473067",
+  "cantidad_productos": 0
+}
+✓ status == 200
+✓ id_categoria exists
+✓ cantidad_productos == 0
+
+---------------------
+
+=== actualizarCategoriaCrud ===
+
+PATCH http://127.0.0.1:38791/categorias/09afcb27-791e-4bad-8724-2eaa638efe53
+accept-encoding: gzip, deflate, br
+accept: */*
+content-length: 63
+content-type: application/json
+user-agent: httpyac
+
+{
+  "descripcion": "Categoria actualizada",
+  "activa": false
+}
+HTTP/1.1 200  - OK
+content-length: 278
+content-type: application/json
+date: Sat, 31 Oct 2026 23:22:18 GMT
+server: uvicorn
+
+{
+  "id_categoria": "09afcb27-791e-4bad-8724-2eaa638efe53",
+  "nombre_categoria": "Categoria CRUD 1793488939084",
+  "descripcion": "Categoria actualizada",
+  "activa": false,
+  "fecha_creacion": "2026-10-31T20:22:19.473059",
+  "fecha_actualizacion": "2026-10-31T20:22:19.725503",
+  "cantidad_productos": 0
+}
+✓ status == 200
+✓ descripcion contains actualizada
+✓ activa == false
+
+---------------------
+
+=== eliminarCategoriaCrud ===
+
+DELETE http://127.0.0.1:38791/categorias/09afcb27-791e-4bad-8724-2eaa638efe53
+accept-encoding: gzip, deflate, br
+accept: */*
+user-agent: httpyac
+HTTP/1.1 204  - No Content
+content-type: application/json
+date: Sat, 31 Oct 2026 23:22:18 GMT
+server: uvicorn
+✓ status == 204
+
+---------------------
+
+=== obtenerCategoriaEliminada ===
+
+GET http://127.0.0.1:38791/categorias/09afcb27-791e-4bad-8724-2eaa638efe53
+accept-encoding: gzip, deflate, br
+accept: */*
+user-agent: httpyac
+HTTP/1.1 404  - Not Found
+content-length: 110
+content-type: application/json
+date: Sat, 31 Oct 2026 23:22:18 GMT
+server: uvicorn
+
+{
+  "error": {
+    "code": "RESOURCE_NOT_FOUND",
+    "message": "No existe una categoría con el ID solicitado",
+    "details": []
+  }
+}
+✓ status == 404
+✓ response.parsedBody.error.code == RESOURCE_NOT_FOUND
+
+---------------------
+
+=== crearCategoriaProducto ===
+
+POST http://127.0.0.1:38791/categorias/
+accept-encoding: gzip, deflate, br
+accept: */*
+content-length: 133
+content-type: application/json
+user-agent: httpyac
+
+{
+  "nombre_categoria": "Categoria Producto 1793488939084",
+  "descripcion": "Categoría auxiliar para el caso 2",
+  "activa": true
+}
+HTTP/1.1 201  - Created
+content-length: 271
+content-type: application/json
+date: Sat, 31 Oct 2026 23:22:19 GMT
+server: uvicorn
+
+{
+  "nombre_categoria": "Categoria Producto 1793488939084",
+  "descripcion": "Categoría auxiliar para el caso 2",
+  "activa": true,
+  "fecha_creacion": "2026-10-31T20:22:19.895074",
+  "fecha_actualizacion": "2026-10-31T20:22:19.895090",
+  "id_categoria": "8ddbf53a-acbd-418d-ab0e-ceb2485a32a0"
+}
+✓ status == 201
+
+---------------------
+
+=== crearProductoCrud ===
+
+POST http://127.0.0.1:38791/productos/
+accept-encoding: gzip, deflate, br
+accept: */*
+content-length: 208
+content-type: application/json
+user-agent: httpyac
+
+{
+  "nombre_producto": "Producto CRUD 1793488939084",
+  "descripcion": "Creado para el caso 2",
+  "stock": 10,
+  "stock_minimo": 2,
+  "id_categoria": "8ddbf53a-acbd-418d-ab0e-ceb2485a32a0",
+  "precio": 1500
+}
+HTTP/1.1 201  - Created
+content-length: 333
+content-type: application/json
+date: Sat, 31 Oct 2026 23:22:19 GMT
+server: uvicorn
+
+{
+  "nombre_producto": "Producto CRUD 1793488939084",
+  "descripcion": "Creado para el caso 2",
+  "stock": 10,
+  "stock_minimo": 2,
+  "id_categoria": "8ddbf53a-acbd-418d-ab0e-ceb2485a32a0",
+  "precio": 1500,
+  "fecha_creacion": "2026-10-31T20:22:19.935844",
+  "fecha_actualizacion": "2026-10-31T20:22:19.935863",
+  "id_producto": "34b4c90a-bf99-4247-9f85-e244ca54b9c1"
+}
+✓ status == 201
+✓ id_producto exists
+✓ stock == 10
+
+---------------------
+
+=== obtenerProductoCrud ===
+
+GET http://127.0.0.1:38791/productos/34b4c90a-bf99-4247-9f85-e244ca54b9c1
+accept-encoding: gzip, deflate, br
+accept: */*
+user-agent: httpyac
+HTTP/1.1 200  - OK
+content-length: 333
+content-type: application/json
+date: Sat, 31 Oct 2026 23:22:19 GMT
+server: uvicorn
+
+{
+  "id_producto": "34b4c90a-bf99-4247-9f85-e244ca54b9c1",
+  "nombre_producto": "Producto CRUD 1793488939084",
+  "descripcion": "Creado para el caso 2",
+  "stock": 10,
+  "stock_minimo": 2,
+  "id_categoria": "8ddbf53a-acbd-418d-ab0e-ceb2485a32a0",
+  "precio": 1500,
+  "fecha_creacion": "2026-10-31T20:22:19.935844",
+  "fecha_actualizacion": "2026-10-31T20:22:19.935863"
+}
+✓ status == 200
+✓ stock == 10
+✓ precio == 1500
+
+---------------------
+
+=== actualizarProductoCrud ===
+
+PATCH http://127.0.0.1:38791/productos/34b4c90a-bf99-4247-9f85-e244ca54b9c1
+accept-encoding: gzip, deflate, br
+accept: */*
+content-length: 16
+content-type: application/json
+user-agent: httpyac
+
+{
+  "stock": 7
+}
+HTTP/1.1 200  - OK
+content-length: 332
+content-type: application/json
+date: Sat, 31 Oct 2026 23:22:19 GMT
+server: uvicorn
+
+{
+  "id_producto": "34b4c90a-bf99-4247-9f85-e244ca54b9c1",
+  "nombre_producto": "Producto CRUD 1793488939084",
+  "descripcion": "Creado para el caso 2",
+  "stock": 7,
+  "stock_minimo": 2,
+  "id_categoria": "8ddbf53a-acbd-418d-ab0e-ceb2485a32a0",
+  "precio": 1500,
+  "fecha_creacion": "2026-10-31T20:22:19.935844",
+  "fecha_actualizacion": "2026-10-31T20:22:20.045973"
+}
+✓ status == 200
+✓ stock == 7
+
+---------------------
+
+=== eliminarProductoCrud ===
+
+DELETE http://127.0.0.1:38791/productos/34b4c90a-bf99-4247-9f85-e244ca54b9c1
+accept-encoding: gzip, deflate, br
+accept: */*
+user-agent: httpyac
+HTTP/1.1 204  - No Content
+content-type: application/json
+date: Sat, 31 Oct 2026 23:22:19 GMT
+server: uvicorn
+✓ status == 204
+
+---------------------
+
+=== obtenerProductoEliminado ===
+
+GET http://127.0.0.1:38791/productos/34b4c90a-bf99-4247-9f85-e244ca54b9c1
+accept-encoding: gzip, deflate, br
+accept: */*
+user-agent: httpyac
+HTTP/1.1 404  - Not Found
+content-length: 107
+content-type: application/json
+date: Sat, 31 Oct 2026 23:22:19 GMT
+server: uvicorn
+
+{
+  "error": {
+    "code": "RESOURCE_NOT_FOUND",
+    "message": "No existe un producto con el ID solicitado",
+    "details": []
+  }
+}
+✓ status == 404
+✓ response.parsedBody.error.code == RESOURCE_NOT_FOUND
+
+---------------------
+
+=== eliminarCategoriaProducto ===
+
+DELETE http://127.0.0.1:38791/categorias/8ddbf53a-acbd-418d-ab0e-ceb2485a32a0
+accept-encoding: gzip, deflate, br
+accept: */*
+user-agent: httpyac
+HTTP/1.1 204  - No Content
+content-type: application/json
+date: Sat, 31 Oct 2026 23:22:19 GMT
+server: uvicorn
+✓ status == 204
+
+---------------------
+
+=== productoInvalido ===
+
+POST http://127.0.0.1:38791/productos/
+accept-encoding: gzip, deflate, br
+accept: */*
+content-length: 2
+content-type: application/json
+user-agent: httpyac
+
+{}
+HTTP/1.1 422  - Unprocessable Content
+content-length: 316
+content-type: application/json
+date: Sat, 31 Oct 2026 23:22:19 GMT
+server: uvicorn
+
+{
+  "error": {
+    "code": "VALIDATION_ERROR",
+    "message": "Los datos no cumplen las validaciones del esquema",
+    "details": [
+      "body.nombre_producto: Field required",
+      "body.descripcion: Field required",
+      "body.stock: Field required",
+      "body.stock_minimo: Field required",
+      "body.id_categoria: Field required",
+      "body.precio: Field required"
+    ]
+  }
+}
+✓ status == 422
+✓ response.parsedBody.error.code == VALIDATION_ERROR
+✓ response.parsedBody.error.details.length > 0
+
+---------------------
+
+=== categoriaInexistente ===
+
+GET http://127.0.0.1:38791/categorias/00000000-0000-0000-0000-000000000000
+accept-encoding: gzip, deflate, br
+accept: */*
+user-agent: httpyac
+HTTP/1.1 404  - Not Found
+content-length: 110
+content-type: application/json
+date: Sat, 31 Oct 2026 23:22:19 GMT
+server: uvicorn
+
+{
+  "error": {
+    "code": "RESOURCE_NOT_FOUND",
+    "message": "No existe una categoría con el ID solicitado",
+    "details": []
+  }
+}
+✓ status == 404
+✓ response.parsedBody.error.code == RESOURCE_NOT_FOUND
+
+---------------------
+
+=== crearCategoriaStock ===
+
+POST http://127.0.0.1:38791/categorias/
+accept-encoding: gzip, deflate, br
+accept: */*
+content-length: 130
+content-type: application/json
+user-agent: httpyac
+
+{
+  "nombre_categoria": "Categoria Stock 1793488939084",
+  "descripcion": "Categoría auxiliar para el caso 5",
+  "activa": true
+}
+HTTP/1.1 201  - Created
+content-length: 268
+content-type: application/json
+date: Sat, 31 Oct 2026 23:22:19 GMT
+server: uvicorn
+
+{
+  "nombre_categoria": "Categoria Stock 1793488939084",
+  "descripcion": "Categoría auxiliar para el caso 5",
+  "activa": true,
+  "fecha_creacion": "2026-10-31T20:22:20.212179",
+  "fecha_actualizacion": "2026-10-31T20:22:20.212190",
+  "id_categoria": "aa36d434-4b69-4c97-93c0-b64f748aabc6"
+}
+✓ status == 201
+
+---------------------
+
+=== crearProductoStock ===
+
+POST http://127.0.0.1:38791/productos/
+accept-encoding: gzip, deflate, br
+accept: */*
+content-length: 220
+content-type: application/json
+user-agent: httpyac
+
+{
+  "nombre_producto": "Producto Stock 1793488939084",
+  "descripcion": "Stock insuficiente para el caso 5",
+  "stock": 1,
+  "stock_minimo": 1,
+  "id_categoria": "aa36d434-4b69-4c97-93c0-b64f748aabc6",
+  "precio": 1000
+}
+HTTP/1.1 201  - Created
+content-length: 345
+content-type: application/json
+date: Sat, 31 Oct 2026 23:22:19 GMT
+server: uvicorn
+
+{
+  "nombre_producto": "Producto Stock 1793488939084",
+  "descripcion": "Stock insuficiente para el caso 5",
+  "stock": 1,
+  "stock_minimo": 1,
+  "id_categoria": "aa36d434-4b69-4c97-93c0-b64f748aabc6",
+  "precio": 1000,
+  "fecha_creacion": "2026-10-31T20:22:20.236156",
+  "fecha_actualizacion": "2026-10-31T20:22:20.236168",
+  "id_producto": "2a2e3a57-ab36-4e37-af86-d7536c3cb082"
+}
+✓ status == 201
+
+---------------------
+
+=== ventaSinStock ===
+
+POST http://127.0.0.1:38791/ventas
+accept-encoding: gzip, deflate, br
+accept: */*
+content-length: 173
+content-type: application/json
+user-agent: httpyac
+
+{
+  "cliente": "Cliente Sin Stock 1793488939084",
+  "detalles": [
+    {
+      "id_producto": "2a2e3a57-ab36-4e37-af86-d7536c3cb082",
+      "cantidad_producto": 2
+    }
+  ]
+}
+HTTP/1.1 400  - Bad Request
+content-length: 155
+content-type: application/json
+date: Sat, 31 Oct 2026 23:22:19 GMT
+server: uvicorn
+
+{
+  "error": {
+    "code": "BUSINESS_RULE_VIOLATION",
+    "message": "Stock insuficiente para 'Producto Stock 1793488939084': Disponible '1', solicitado'2'",
+    "details": []
+  }
+}
+✓ status == 400
+✓ response.parsedBody.error.code == BUSINESS_RULE_VIOLATION
+
+---------------------
+
+=== limpiarProductoStock ===
+
+DELETE http://127.0.0.1:38791/productos/2a2e3a57-ab36-4e37-af86-d7536c3cb082
+accept-encoding: gzip, deflate, br
+accept: */*
+user-agent: httpyac
+HTTP/1.1 204  - No Content
+content-type: application/json
+date: Sat, 31 Oct 2026 23:22:19 GMT
+server: uvicorn
+✓ status == 204
+
+---------------------
+
+=== limpiarCategoriaStock ===
+
+DELETE http://127.0.0.1:38791/categorias/aa36d434-4b69-4c97-93c0-b64f748aabc6
+accept-encoding: gzip, deflate, br
+accept: */*
+user-agent: httpyac
+HTTP/1.1 204  - No Content
+content-type: application/json
+date: Sat, 31 Oct 2026 23:22:19 GMT
+server: uvicorn
+✓ status == 204
+
+---------------------
+
+=== crearCategoriaFiltro ===
+
+POST http://127.0.0.1:38791/categorias/
+accept-encoding: gzip, deflate, br
+accept: */*
+content-length: 131
+content-type: application/json
+user-agent: httpyac
+
+{
+  "nombre_categoria": "Categoria Filtro 1793488939084",
+  "descripcion": "Categoría auxiliar para el caso 6",
+  "activa": true
+}
+HTTP/1.1 201  - Created
+content-length: 269
+content-type: application/json
+date: Sat, 31 Oct 2026 23:22:19 GMT
+server: uvicorn
+
+{
+  "nombre_categoria": "Categoria Filtro 1793488939084",
+  "descripcion": "Categoría auxiliar para el caso 6",
+  "activa": true,
+  "fecha_creacion": "2026-10-31T20:22:20.331439",
+  "fecha_actualizacion": "2026-10-31T20:22:20.331450",
+  "id_categoria": "64e0fd1d-5a9a-40a1-a8d2-705edfc9a24c"
+}
+✓ status == 201
+
+---------------------
+
+=== crearProductoFiltroA ===
+
+POST http://127.0.0.1:38791/productos/
+accept-encoding: gzip, deflate, br
+accept: */*
+content-length: 203
+content-type: application/json
+user-agent: httpyac
+
+{
+  "nombre_producto": "Filtro-1793488939084-A",
+  "descripcion": "Producto A para filtro",
+  "stock": 10,
+  "stock_minimo": 1,
+  "id_categoria": "64e0fd1d-5a9a-40a1-a8d2-705edfc9a24c",
+  "precio": 100
+}
+HTTP/1.1 201  - Created
+content-length: 328
+content-type: application/json
+date: Sat, 31 Oct 2026 23:22:19 GMT
+server: uvicorn
+
+{
+  "nombre_producto": "Filtro-1793488939084-A",
+  "descripcion": "Producto A para filtro",
+  "stock": 10,
+  "stock_minimo": 1,
+  "id_categoria": "64e0fd1d-5a9a-40a1-a8d2-705edfc9a24c",
+  "precio": 100,
+  "fecha_creacion": "2026-10-31T20:22:20.359218",
+  "fecha_actualizacion": "2026-10-31T20:22:20.359251",
+  "id_producto": "b3d1b1b8-025e-43d3-8ed0-d56b0d704c81"
+}
+✓ status == 201
+
+---------------------
+
+=== crearProductoFiltroB ===
+
+POST http://127.0.0.1:38791/productos/
+accept-encoding: gzip, deflate, br
+accept: */*
+content-length: 203
+content-type: application/json
+user-agent: httpyac
+
+{
+  "nombre_producto": "Filtro-1793488939084-B",
+  "descripcion": "Producto B para filtro",
+  "stock": 10,
+  "stock_minimo": 1,
+  "id_categoria": "64e0fd1d-5a9a-40a1-a8d2-705edfc9a24c",
+  "precio": 300
+}
+HTTP/1.1 201  - Created
+content-length: 328
+content-type: application/json
+date: Sat, 31 Oct 2026 23:22:19 GMT
+server: uvicorn
+
+{
+  "nombre_producto": "Filtro-1793488939084-B",
+  "descripcion": "Producto B para filtro",
+  "stock": 10,
+  "stock_minimo": 1,
+  "id_categoria": "64e0fd1d-5a9a-40a1-a8d2-705edfc9a24c",
+  "precio": 300,
+  "fecha_creacion": "2026-10-31T20:22:20.385433",
+  "fecha_actualizacion": "2026-10-31T20:22:20.385442",
+  "id_producto": "898ee003-5857-4d57-8a3f-67ec5ce87221"
+}
+✓ status == 201
+
+---------------------
+
+=== crearProductoFiltroC ===
+
+POST http://127.0.0.1:38791/productos/
+accept-encoding: gzip, deflate, br
+accept: */*
+content-length: 203
+content-type: application/json
+user-agent: httpyac
+
+{
+  "nombre_producto": "Filtro-1793488939084-C",
+  "descripcion": "Producto C para filtro",
+  "stock": 10,
+  "stock_minimo": 1,
+  "id_categoria": "64e0fd1d-5a9a-40a1-a8d2-705edfc9a24c",
+  "precio": 200
+}
+HTTP/1.1 201  - Created
+content-length: 328
+content-type: application/json
+date: Sat, 31 Oct 2026 23:22:19 GMT
+server: uvicorn
+
+{
+  "nombre_producto": "Filtro-1793488939084-C",
+  "descripcion": "Producto C para filtro",
+  "stock": 10,
+  "stock_minimo": 1,
+  "id_categoria": "64e0fd1d-5a9a-40a1-a8d2-705edfc9a24c",
+  "precio": 200,
+  "fecha_creacion": "2026-10-31T20:22:20.415088",
+  "fecha_actualizacion": "2026-10-31T20:22:20.415102",
+  "id_producto": "936b684d-7a96-44e1-9502-810c53efba85"
+}
+✓ status == 201
+
+---------------------
+
+=== consultaFiltroPagina1 ===
+
+GET http://127.0.0.1:38791/productos/?nombre=Filtro-1793488939084&ordenar_por=precio&direccion=desc&pagina=1&limite=2
+accept-encoding: gzip, deflate, br
+accept: */*
+user-agent: httpyac
+HTTP/1.1 200  - OK
+content-length: 719
+content-type: application/json
+date: Sat, 31 Oct 2026 23:22:19 GMT
+server: uvicorn
+
+{
+  "items": [
+    {
+      "id_producto": "898ee003-5857-4d57-8a3f-67ec5ce87221",
+      "nombre_producto": "Filtro-1793488939084-B",
+      "descripcion": "Producto B para filtro",
+      "stock": 10,
+      "stock_minimo": 1,
+      "id_categoria": "64e0fd1d-5a9a-40a1-a8d2-705edfc9a24c",
+      "precio": 300,
+      "fecha_creacion": "2026-10-31T20:22:20.385433",
+      "fecha_actualizacion": "2026-10-31T20:22:20.385442"
+    },
+    {
+      "id_producto": "936b684d-7a96-44e1-9502-810c53efba85",
+      "nombre_producto": "Filtro-1793488939084-C",
+      "descripcion": "Producto C para filtro",
+      "stock": 10,
+      "stock_minimo": 1,
+      "id_categoria": "64e0fd1d-5a9a-40a1-a8d2-705edfc9a24c",
+      "precio": 200,
+      "fecha_creacion": "2026-10-31T20:22:20.415088",
+      "fecha_actualizacion": "2026-10-31T20:22:20.415102"
+    }
+  ],
+  "total": 3,
+  "pagina": 1,
+  "limite": 2,
+  "total_paginas": 2
+}
+✓ status == 200
+✓ response.parsedBody.total == 3
+✓ response.parsedBody.total_paginas == 2
+✓ response.parsedBody.pagina == 1
+✓ response.parsedBody.limite == 2
+✓ response.parsedBody.items.length == 2
+✓ response.parsedBody.items[0].precio == 300
+✓ response.parsedBody.items[1].precio == 200
+
+---------------------
+
+=== consultaFiltroPagina2 ===
+
+GET http://127.0.0.1:38791/productos/?nombre=Filtro-1793488939084&ordenar_por=precio&direccion=desc&pagina=2&limite=2
+accept-encoding: gzip, deflate, br
+accept: */*
+user-agent: httpyac
+HTTP/1.1 200  - OK
+content-length: 390
+content-type: application/json
+date: Sat, 31 Oct 2026 23:22:19 GMT
+server: uvicorn
+
+{
+  "items": [
+    {
+      "id_producto": "b3d1b1b8-025e-43d3-8ed0-d56b0d704c81",
+      "nombre_producto": "Filtro-1793488939084-A",
+      "descripcion": "Producto A para filtro",
+      "stock": 10,
+      "stock_minimo": 1,
+      "id_categoria": "64e0fd1d-5a9a-40a1-a8d2-705edfc9a24c",
+      "precio": 100,
+      "fecha_creacion": "2026-10-31T20:22:20.359218",
+      "fecha_actualizacion": "2026-10-31T20:22:20.359251"
+    }
+  ],
+  "total": 3,
+  "pagina": 2,
+  "limite": 2,
+  "total_paginas": 2
+}
+✓ status == 200
+✓ response.parsedBody.total == 3
+✓ response.parsedBody.total_paginas == 2
+✓ response.parsedBody.items.length == 1
+✓ response.parsedBody.items[0].precio == 100
+
+---------------------
+
+=== limpiarProductoFiltroA ===
+
+DELETE http://127.0.0.1:38791/productos/b3d1b1b8-025e-43d3-8ed0-d56b0d704c81
+accept-encoding: gzip, deflate, br
+accept: */*
+user-agent: httpyac
+HTTP/1.1 204  - No Content
+content-type: application/json
+date: Sat, 31 Oct 2026 23:22:19 GMT
+server: uvicorn
+✓ status == 204
+
+---------------------
+
+=== limpiarProductoFiltroB ===
+
+DELETE http://127.0.0.1:38791/productos/898ee003-5857-4d57-8a3f-67ec5ce87221
+accept-encoding: gzip, deflate, br
+accept: */*
+user-agent: httpyac
+HTTP/1.1 204  - No Content
+content-type: application/json
+date: Sat, 31 Oct 2026 23:22:19 GMT
+server: uvicorn
+✓ status == 204
+
+---------------------
+
+=== limpiarProductoFiltroC ===
+
+DELETE http://127.0.0.1:38791/productos/936b684d-7a96-44e1-9502-810c53efba85
+accept-encoding: gzip, deflate, br
+accept: */*
+user-agent: httpyac
+HTTP/1.1 204  - No Content
+content-type: application/json
+date: Sat, 31 Oct 2026 23:22:19 GMT
+server: uvicorn
+✓ status == 204
+
+---------------------
+
+=== limpiarCategoriaFiltro ===
+
+DELETE http://127.0.0.1:38791/categorias/64e0fd1d-5a9a-40a1-a8d2-705edfc9a24c
+accept-encoding: gzip, deflate, br
+accept: */*
+user-agent: httpyac
+HTTP/1.1 204  - No Content
+content-type: application/json
+date: Sat, 31 Oct 2026 23:22:19 GMT
+server: uvicorn
+✓ status == 204
+
+---------------------
+
+=== crearCategoriaPersistencia ===
+
+POST http://127.0.0.1:38791/categorias/
+accept-encoding: gzip, deflate, br
+accept: */*
+content-length: 137
+content-type: application/json
+user-agent: httpyac
+
+{
+  "nombre_categoria": "Categoria Persistencia 1793488939084",
+  "descripcion": "Categoría auxiliar para el caso 7",
+  "activa": true
+}
+HTTP/1.1 201  - Created
+content-length: 275
+content-type: application/json
+date: Sat, 31 Oct 2026 23:22:19 GMT
+server: uvicorn
+
+{
+  "nombre_categoria": "Categoria Persistencia 1793488939084",
+  "descripcion": "Categoría auxiliar para el caso 7",
+  "activa": true,
+  "fecha_creacion": "2026-10-31T20:22:20.602460",
+  "fecha_actualizacion": "2026-10-31T20:22:20.602473",
+  "id_categoria": "6ebdc4d9-4842-41b0-97bc-16076b793f50"
+}
+✓ status == 201
+
+---------------------
+
+=== crearProductoPersistencia ===
+
+POST http://127.0.0.1:38791/productos/
+accept-encoding: gzip, deflate, br
+accept: */*
+content-length: 217
+content-type: application/json
+user-agent: httpyac
+
+{
+  "nombre_producto": "Producto Persistencia 1793488939084",
+  "descripcion": "Producto para el caso 7",
+  "stock": 5,
+  "stock_minimo": 1,
+  "id_categoria": "6ebdc4d9-4842-41b0-97bc-16076b793f50",
+  "precio": 1000
+}
+HTTP/1.1 201  - Created
+content-length: 342
+content-type: application/json
+date: Sat, 31 Oct 2026 23:22:19 GMT
+server: uvicorn
+
+{
+  "nombre_producto": "Producto Persistencia 1793488939084",
+  "descripcion": "Producto para el caso 7",
+  "stock": 5,
+  "stock_minimo": 1,
+  "id_categoria": "6ebdc4d9-4842-41b0-97bc-16076b793f50",
+  "precio": 1000,
+  "fecha_creacion": "2026-10-31T20:22:20.631708",
+  "fecha_actualizacion": "2026-10-31T20:22:20.631828",
+  "id_producto": "d8fd28b2-3e8a-4f7e-b895-8579f5b86735"
+}
+✓ status == 201
+
+---------------------
+
+=== crearVentaPersistencia ===
+
+POST http://127.0.0.1:38791/ventas
+accept-encoding: gzip, deflate, br
+accept: */*
+content-length: 176
+content-type: application/json
+user-agent: httpyac
+
+{
+  "cliente": "Cliente Persistencia 1793488939084",
+  "detalles": [
+    {
+      "id_producto": "d8fd28b2-3e8a-4f7e-b895-8579f5b86735",
+      "cantidad_producto": 2
+    }
+  ]
+}
+HTTP/1.1 201  - Created
+content-length: 359
+content-type: application/json
+date: Sat, 31 Oct 2026 23:22:19 GMT
+server: uvicorn
+
+{
+  "id_venta": "95df23a1-7913-4cc7-8796-daa8087765c1",
+  "fecha_venta": "2026-10-31",
+  "cliente": "Cliente Persistencia 1793488939084",
+  "total": 2000,
+  "detalles": [
+    {
+      "id_detalle": "8e305076-336d-457f-a3c4-595d07fd67c0",
+      "id_producto": "d8fd28b2-3e8a-4f7e-b895-8579f5b86735",
+      "cantidad_producto": 2,
+      "precio_unitario": 1000,
+      "subtotal": 2000,
+      "iva": 0,
+      "descuento": 0
+    }
+  ],
+  "pago": null
+}
+✓ status == 201
+✓ id_venta exists
+✓ response.parsedBody.total == 2000
+✓ response.parsedBody.detalles.length == 1
+
+---------------------
+
+=== leerVentaPersistida ===
+
+GET http://127.0.0.1:38791/ventas/95df23a1-7913-4cc7-8796-daa8087765c1
+accept-encoding: gzip, deflate, br
+accept: */*
+user-agent: httpyac
+HTTP/1.1 200  - OK
+content-length: 359
+content-type: application/json
+date: Sat, 31 Oct 2026 23:22:19 GMT
+server: uvicorn
+
+{
+  "id_venta": "95df23a1-7913-4cc7-8796-daa8087765c1",
+  "fecha_venta": "2026-10-31",
+  "cliente": "Cliente Persistencia 1793488939084",
+  "total": 2000,
+  "detalles": [
+    {
+      "id_detalle": "8e305076-336d-457f-a3c4-595d07fd67c0",
+      "id_producto": "d8fd28b2-3e8a-4f7e-b895-8579f5b86735",
+      "cantidad_producto": 2,
+      "precio_unitario": 1000,
+      "subtotal": 2000,
+      "iva": 0,
+      "descuento": 0
+    }
+  ],
+  "pago": null
+}
+✓ status == 200
+✓ response.parsedBody.id_venta exists
+✓ response.parsedBody.total == 2000
+✓ response.parsedBody.cliente contains Persistencia
+✓ response.parsedBody.detalles.length == 1
+
+---------------------
+
+=== boletaVentaPersistida ===
+
+GET http://127.0.0.1:38791/ventas/95df23a1-7913-4cc7-8796-daa8087765c1/boleta
+accept-encoding: gzip, deflate, br
+accept: */*
+user-agent: httpyac
+HTTP/1.1 200  - OK
+content-length: 261
+content-type: application/json
+date: Sat, 31 Oct 2026 23:22:19 GMT
+server: uvicorn
+
+{
+  "id_venta": "95df23a1-7913-4cc7-8796-daa8087765c1",
+  "fecha_venta": "2026-10-31",
+  "cliente": "Cliente Persistencia 1793488939084",
+  "items": [
+    {
+      "producto_id": "d8fd28b2-3e8a-4f7e-b895-8579f5b86735",
+      "cantidad": 2,
+      "precio_unitario": 1000,
+      "subtotal": 2000
+    }
+  ],
+  "total": 2000
+}
+✓ status == 200
+✓ response.parsedBody.total == 2000
+✓ response.parsedBody.items.length == 1
+
+---------------------
+
+=== limpiarVentaPersistencia ===
+
+DELETE http://127.0.0.1:38791/ventas/95df23a1-7913-4cc7-8796-daa8087765c1
+accept-encoding: gzip, deflate, br
+accept: */*
+user-agent: httpyac
+HTTP/1.1 204  - No Content
+content-type: application/json
+date: Sat, 31 Oct 2026 23:22:19 GMT
+server: uvicorn
+✓ status == 204
+
+---------------------
+
+=== limpiarProductoPersistencia ===
+
+DELETE http://127.0.0.1:38791/productos/d8fd28b2-3e8a-4f7e-b895-8579f5b86735
+accept-encoding: gzip, deflate, br
+accept: */*
+user-agent: httpyac
+HTTP/1.1 204  - No Content
+content-type: application/json
+date: Sat, 31 Oct 2026 23:22:19 GMT
+server: uvicorn
+✓ status == 204
+
+---------------------
+
+=== limpiarCategoriaPersistencia ===
+
+DELETE http://127.0.0.1:38791/categorias/6ebdc4d9-4842-41b0-97bc-16076b793f50
+accept-encoding: gzip, deflate, br
+accept: */*
+user-agent: httpyac
+HTTP/1.1 204  - No Content
+content-type: application/json
+date: Sat, 31 Oct 2026 23:22:20 GMT
+server: uvicorn
+✓ status == 204
+
+---------------------
+
+=== crearCategoriaPago ===
+
+POST http://127.0.0.1:38791/categorias/
+accept-encoding: gzip, deflate, br
+accept: */*
+content-length: 129
+content-type: application/json
+user-agent: httpyac
+
+{
+  "nombre_categoria": "Categoria Pago 1793488939084",
+  "descripcion": "Categoría auxiliar para el caso 8",
+  "activa": true
+}
+HTTP/1.1 201  - Created
+content-length: 267
+content-type: application/json
+date: Sat, 31 Oct 2026 23:22:20 GMT
+server: uvicorn
+
+{
+  "nombre_categoria": "Categoria Pago 1793488939084",
+  "descripcion": "Categoría auxiliar para el caso 8",
+  "activa": true,
+  "fecha_creacion": "2026-10-31T20:22:20.947334",
+  "fecha_actualizacion": "2026-10-31T20:22:20.947350",
+  "id_categoria": "d57f2e40-05db-4775-8669-5e20881c5ad4"
+}
+✓ status == 201
+
+---------------------
+
+=== crearProductoPago ===
+
+POST http://127.0.0.1:38791/productos/
+accept-encoding: gzip, deflate, br
+accept: */*
+content-length: 209
+content-type: application/json
+user-agent: httpyac
+
+{
+  "nombre_producto": "Producto Pago 1793488939084",
+  "descripcion": "Producto para el caso 8",
+  "stock": 10,
+  "stock_minimo": 1,
+  "id_categoria": "d57f2e40-05db-4775-8669-5e20881c5ad4",
+  "precio": 100
+}
+HTTP/1.1 201  - Created
+content-length: 334
+content-type: application/json
+date: Sat, 31 Oct 2026 23:22:20 GMT
+server: uvicorn
+
+{
+  "nombre_producto": "Producto Pago 1793488939084",
+  "descripcion": "Producto para el caso 8",
+  "stock": 10,
+  "stock_minimo": 1,
+  "id_categoria": "d57f2e40-05db-4775-8669-5e20881c5ad4",
+  "precio": 100,
+  "fecha_creacion": "2026-10-31T20:22:20.985614",
+  "fecha_actualizacion": "2026-10-31T20:22:20.985635",
+  "id_producto": "190089e8-4c8f-4af1-95bb-3d5394acd8dc"
+}
+✓ status == 201
+
+---------------------
+
+=== crearVentaPago ===
+
+POST http://127.0.0.1:38791/ventas
+accept-encoding: gzip, deflate, br
+accept: */*
+content-length: 168
+content-type: application/json
+user-agent: httpyac
+
+{
+  "cliente": "Cliente Pago 1793488939084",
+  "detalles": [
+    {
+      "id_producto": "190089e8-4c8f-4af1-95bb-3d5394acd8dc",
+      "cantidad_producto": 1
+    }
+  ]
+}
+HTTP/1.1 201  - Created
+content-length: 348
+content-type: application/json
+date: Sat, 31 Oct 2026 23:22:20 GMT
+server: uvicorn
+
+{
+  "id_venta": "d423e6b3-a9d6-4a0d-8628-4979cc9a79db",
+  "fecha_venta": "2026-10-31",
+  "cliente": "Cliente Pago 1793488939084",
+  "total": 100,
+  "detalles": [
+    {
+      "id_detalle": "b34cc94e-5290-4a0c-b018-d055563da832",
+      "id_producto": "190089e8-4c8f-4af1-95bb-3d5394acd8dc",
+      "cantidad_producto": 1,
+      "precio_unitario": 100,
+      "subtotal": 100,
+      "iva": 0,
+      "descuento": 0
+    }
+  ],
+  "pago": null
+}
+✓ status == 201
+✓ response.parsedBody.total == 100
+
+---------------------
+
+=== pagoMontoIncorrecto ===
+
+POST http://127.0.0.1:38791/pagos
+accept-encoding: gzip, deflate, br
+accept: */*
+content-length: 98
+content-type: application/json
+user-agent: httpyac
+
+{
+  "id_venta": "d423e6b3-a9d6-4a0d-8628-4979cc9a79db",
+  "monto": 50,
+  "metodo_pago": "debito"
+}
+HTTP/1.1 400  - Bad Request
+content-length: 122
+content-type: application/json
+date: Sat, 31 Oct 2026 23:22:20 GMT
+server: uvicorn
+
+{
+  "error": {
+    "code": "BUSINESS_RULE_VIOLATION",
+    "message": "El monto debe ser igual al total de la venta (100.0)",
+    "details": []
+  }
+}
+✓ status == 400
+✓ response.parsedBody.error.code == BUSINESS_RULE_VIOLATION
+
+---------------------
+
+=== pagoCorrecto ===
+
+POST http://127.0.0.1:38791/pagos
+accept-encoding: gzip, deflate, br
+accept: */*
+content-length: 99
+content-type: application/json
+user-agent: httpyac
+
+{
+  "id_venta": "d423e6b3-a9d6-4a0d-8628-4979cc9a79db",
+  "monto": 100,
+  "metodo_pago": "debito"
+}
+HTTP/1.1 201  - Created
+content-length: 187
+content-type: application/json
+date: Sat, 31 Oct 2026 23:22:20 GMT
+server: uvicorn
+
+{
+  "id_pago": "213fa083-5822-4e6c-83c5-30d8ae5279a7",
+  "id_venta": "d423e6b3-a9d6-4a0d-8628-4979cc9a79db",
+  "fecha_pago": "2026-10-31",
+  "monto": 100,
+  "metodo_pago": "debito",
+  "estado_pago": "exitoso"
+}
+✓ status == 201
+✓ id_pago exists
+✓ response.parsedBody.estado_pago == exitoso
+✓ response.parsedBody.id_venta exists
+
+---------------------
+
+=== pagoDuplicado ===
+
+POST http://127.0.0.1:38791/pagos
+accept-encoding: gzip, deflate, br
+accept: */*
+content-length: 99
+content-type: application/json
+user-agent: httpyac
+
+{
+  "id_venta": "d423e6b3-a9d6-4a0d-8628-4979cc9a79db",
+  "monto": 100,
+  "metodo_pago": "debito"
+}
+HTTP/1.1 400  - Bad Request
+content-length: 101
+content-type: application/json
+date: Sat, 31 Oct 2026 23:22:20 GMT
+server: uvicorn
+
+{
+  "error": {
+    "code": "BUSINESS_RULE_VIOLATION",
+    "message": "La venta ya se encuentra pagada",
+    "details": []
+  }
+}
+✓ status == 400
+✓ response.parsedBody.error.code == BUSINESS_RULE_VIOLATION
+
+---------------------
+
+=== obtenerPagoCreado ===
+
+GET http://127.0.0.1:38791/pagos/213fa083-5822-4e6c-83c5-30d8ae5279a7
+accept-encoding: gzip, deflate, br
+accept: */*
+user-agent: httpyac
+HTTP/1.1 200  - OK
+content-length: 187
+content-type: application/json
+date: Sat, 31 Oct 2026 23:22:20 GMT
+server: uvicorn
+
+{
+  "id_pago": "213fa083-5822-4e6c-83c5-30d8ae5279a7",
+  "id_venta": "d423e6b3-a9d6-4a0d-8628-4979cc9a79db",
+  "fecha_pago": "2026-10-31",
+  "monto": 100,
+  "metodo_pago": "debito",
+  "estado_pago": "exitoso"
+}
+✓ status == 200
+✓ response.parsedBody.id_pago exists
+✓ response.parsedBody.estado_pago == exitoso
+
+---------------------
+
+=== ventaConPago ===
+
+GET http://127.0.0.1:38791/ventas/d423e6b3-a9d6-4a0d-8628-4979cc9a79db
+accept-encoding: gzip, deflate, br
+accept: */*
+user-agent: httpyac
+HTTP/1.1 200  - OK
+content-length: 531
+content-type: application/json
+date: Sat, 31 Oct 2026 23:22:20 GMT
+server: uvicorn
+
+{
+  "id_venta": "d423e6b3-a9d6-4a0d-8628-4979cc9a79db",
+  "fecha_venta": "2026-10-31",
+  "cliente": "Cliente Pago 1793488939084",
+  "total": 100,
+  "detalles": [
+    {
+      "id_detalle": "b34cc94e-5290-4a0c-b018-d055563da832",
+      "id_producto": "190089e8-4c8f-4af1-95bb-3d5394acd8dc",
+      "cantidad_producto": 1,
+      "precio_unitario": 100,
+      "subtotal": 100,
+      "iva": 0,
+      "descuento": 0
+    }
+  ],
+  "pago": {
+    "id_pago": "213fa083-5822-4e6c-83c5-30d8ae5279a7",
+    "id_venta": "d423e6b3-a9d6-4a0d-8628-4979cc9a79db",
+    "fecha_pago": "2026-10-31",
+    "monto": 100,
+    "metodo_pago": "debito",
+    "estado_pago": "exitoso"
+  }
+}
+✓ status == 200
+✓ response.parsedBody.pago.id_pago exists
+✓ response.parsedBody.pago.estado_pago == exitoso
+
+---------------------
+
+=== eliminarVentaPagada ===
+
+DELETE http://127.0.0.1:38791/ventas/d423e6b3-a9d6-4a0d-8628-4979cc9a79db
+accept-encoding: gzip, deflate, br
+accept: */*
+user-agent: httpyac
+HTTP/1.1 409  - Conflict
+content-length: 103
+content-type: application/json
+date: Sat, 31 Oct 2026 23:22:20 GMT
+server: uvicorn
+
+{
+  "error": {
+    "code": "CONFLICT",
+    "message": "No se puede eliminar una venta que ya fue pagada",
+    "details": []
+  }
+}
+✓ status == 409
+✓ response.parsedBody.error.code == CONFLICT
+
+46 requests processed (46 succeeded)
+
+RESULTADO: todas las pruebas pasaron.
+Log guardado en: /home/benjamin/Escritorio/backend-2026-grupo-5/tests/evidencia/ejecucion-20261031-202205.log
