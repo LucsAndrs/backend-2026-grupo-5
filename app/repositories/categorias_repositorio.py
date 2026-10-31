@@ -2,7 +2,7 @@ from sqlalchemy import func
 from sqlalchemy.orm import Session
 from ..excepciones import ConflictError, ResourceNotFoundError
 from ..domain.categorias import Categoria
-from ..models.categoria_bd import CategoriaBD
+from ..models.categoria_modelos import CategoriaBD
 
 
 class CategoriaRepositorio:

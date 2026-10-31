@@ -14,5 +14,5 @@ class DetalleVentaBD(Base):
     iva = Column(Float, nullable=False, default=0.19)
     descuento = Column(Float, nullable=False, default=0.0)
 
-    # Relación bidireccional con el modelo VentaBD de Elías
     venta = relationship("VentaBD", back_populates="detalles")
+    
