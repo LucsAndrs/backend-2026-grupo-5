@@ -1,5 +1,4 @@
 import math
-import uuid
 from datetime import date
 from sqlalchemy.orm import Session
 
@@ -79,7 +78,6 @@ class VentaServicio:
         for producto, detalle_data in productos_validados:
             producto = producto_repositorio.obtener_por_id(bd, producto.id_producto)
             detalle = DetalleVenta(
-                id_detalle= str(uuid.uuid4()),
                 id_producto= producto.id_producto,
                 id_venta= venta.id_venta,
                 cantidad_producto= detalle_data.cantidad_producto,
