@@ -7,7 +7,7 @@ from ..domain.productos import Producto
 from ..schemas.common import PaginatedResponse
 from ..services.productos_service import producto_service
 
-router = APIRouter(prefix="/productos")
+router = APIRouter(prefix="/productos", tags=["Productos"])
 
 
 @router.post("/", response_model=Producto, status_code=status.HTTP_201_CREATED)

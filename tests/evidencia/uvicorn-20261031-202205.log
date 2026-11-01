@@ -1,0 +1,56 @@
+INFO:     Started server process [73916]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:38791 (Press CTRL+C to quit)
+INFO:     127.0.0.1:32860 - "GET /openapi.json HTTP/1.1" 200 OK
+INFO:     127.0.0.1:32862 - "GET /openapi.json HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54744 - "POST /categorias/ HTTP/1.1" 201 Created
+INFO:     127.0.0.1:54744 - "GET /categorias/09afcb27-791e-4bad-8724-2eaa638efe53 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54744 - "PATCH /categorias/09afcb27-791e-4bad-8724-2eaa638efe53 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54744 - "DELETE /categorias/09afcb27-791e-4bad-8724-2eaa638efe53 HTTP/1.1" 204 No Content
+INFO:     127.0.0.1:54744 - "GET /categorias/09afcb27-791e-4bad-8724-2eaa638efe53 HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:54744 - "POST /categorias/ HTTP/1.1" 201 Created
+INFO:     127.0.0.1:54744 - "POST /productos/ HTTP/1.1" 201 Created
+INFO:     127.0.0.1:54744 - "GET /productos/34b4c90a-bf99-4247-9f85-e244ca54b9c1 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54744 - "PATCH /productos/34b4c90a-bf99-4247-9f85-e244ca54b9c1 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54744 - "DELETE /productos/34b4c90a-bf99-4247-9f85-e244ca54b9c1 HTTP/1.1" 204 No Content
+INFO:     127.0.0.1:54744 - "GET /productos/34b4c90a-bf99-4247-9f85-e244ca54b9c1 HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:54744 - "DELETE /categorias/8ddbf53a-acbd-418d-ab0e-ceb2485a32a0 HTTP/1.1" 204 No Content
+INFO:     127.0.0.1:54744 - "POST /productos/ HTTP/1.1" 422 Unprocessable Content
+INFO:     127.0.0.1:54744 - "GET /categorias/00000000-0000-0000-0000-000000000000 HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:54744 - "POST /categorias/ HTTP/1.1" 201 Created
+INFO:     127.0.0.1:54744 - "POST /productos/ HTTP/1.1" 201 Created
+INFO:     127.0.0.1:54744 - "POST /ventas HTTP/1.1" 400 Bad Request
+INFO:     127.0.0.1:54744 - "DELETE /productos/2a2e3a57-ab36-4e37-af86-d7536c3cb082 HTTP/1.1" 204 No Content
+INFO:     127.0.0.1:54744 - "DELETE /categorias/aa36d434-4b69-4c97-93c0-b64f748aabc6 HTTP/1.1" 204 No Content
+INFO:     127.0.0.1:54744 - "POST /categorias/ HTTP/1.1" 201 Created
+INFO:     127.0.0.1:54744 - "POST /productos/ HTTP/1.1" 201 Created
+INFO:     127.0.0.1:54744 - "POST /productos/ HTTP/1.1" 201 Created
+INFO:     127.0.0.1:54744 - "POST /productos/ HTTP/1.1" 201 Created
+INFO:     127.0.0.1:54744 - "GET /productos/?nombre=Filtro-1793488939084&ordenar_por=precio&direccion=desc&pagina=1&limite=2 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54744 - "GET /productos/?nombre=Filtro-1793488939084&ordenar_por=precio&direccion=desc&pagina=2&limite=2 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54744 - "DELETE /productos/b3d1b1b8-025e-43d3-8ed0-d56b0d704c81 HTTP/1.1" 204 No Content
+INFO:     127.0.0.1:54744 - "DELETE /productos/898ee003-5857-4d57-8a3f-67ec5ce87221 HTTP/1.1" 204 No Content
+INFO:     127.0.0.1:54744 - "DELETE /productos/936b684d-7a96-44e1-9502-810c53efba85 HTTP/1.1" 204 No Content
+INFO:     127.0.0.1:54744 - "DELETE /categorias/64e0fd1d-5a9a-40a1-a8d2-705edfc9a24c HTTP/1.1" 204 No Content
+INFO:     127.0.0.1:54744 - "POST /categorias/ HTTP/1.1" 201 Created
+INFO:     127.0.0.1:54744 - "POST /productos/ HTTP/1.1" 201 Created
+INFO:     127.0.0.1:54744 - "POST /ventas HTTP/1.1" 201 Created
+INFO:     127.0.0.1:54744 - "GET /ventas/95df23a1-7913-4cc7-8796-daa8087765c1 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54744 - "GET /ventas/95df23a1-7913-4cc7-8796-daa8087765c1/boleta HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54744 - "DELETE /ventas/95df23a1-7913-4cc7-8796-daa8087765c1 HTTP/1.1" 204 No Content
+INFO:     127.0.0.1:54744 - "DELETE /productos/d8fd28b2-3e8a-4f7e-b895-8579f5b86735 HTTP/1.1" 204 No Content
+INFO:     127.0.0.1:54744 - "DELETE /categorias/6ebdc4d9-4842-41b0-97bc-16076b793f50 HTTP/1.1" 204 No Content
+INFO:     127.0.0.1:54744 - "POST /categorias/ HTTP/1.1" 201 Created
+INFO:     127.0.0.1:54744 - "POST /productos/ HTTP/1.1" 201 Created
+INFO:     127.0.0.1:54744 - "POST /ventas HTTP/1.1" 201 Created
+INFO:     127.0.0.1:54744 - "POST /pagos HTTP/1.1" 400 Bad Request
+INFO:     127.0.0.1:54744 - "POST /pagos HTTP/1.1" 201 Created
+INFO:     127.0.0.1:54744 - "POST /pagos HTTP/1.1" 400 Bad Request
+INFO:     127.0.0.1:54744 - "GET /pagos/213fa083-5822-4e6c-83c5-30d8ae5279a7 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54744 - "GET /ventas/d423e6b3-a9d6-4a0d-8628-4979cc9a79db HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54744 - "DELETE /ventas/d423e6b3-a9d6-4a0d-8628-4979cc9a79db HTTP/1.1" 409 Conflict
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [73916]

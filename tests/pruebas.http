@@ -1,0 +1,657 @@
+# Colección de pruebas reproducibles — Minimarket API
+#
+# Ejecutar con httpyac (CLI):
+#   npx --yes httpyac send tests/pruebas.http --all --no-color
+#
+# O cambiar la URL base:
+#   npx --yes httpyac send tests/pruebas.http --all --no-color --var baseUrl=http://localhost:8002
+#   (también puede usarse --env pruebas con tests/http-client.env.json)
+#
+# La colección está pensada para httpyac: las aserciones con "??" son específicas de httpyac.
+# Las variables {{$timestamp}} generan nombres únicos para poder repetir la colección sin
+# chocar con datos de ejecuciones anteriores.
+#
+# Casos incluidos:
+#   1. CRUD de categoría
+#   2. CRUD de producto
+#   3. Validación inválida (422)
+#   4. Recurso inexistente (404)
+#   5. Regla de negocio: stock insuficiente (400)
+#   6. Consulta con filtro, orden y paginación
+#   7. Persistencia de datos (crear y recuperar una venta)
+#   8. Reglas de negocio de pago y conflicto al eliminar venta pagada
+
+# baseUrl se define con --var o con tests/http-client.env.json.
+@sufijo = {{$timestamp}}
+
+###############################################################################
+# CASO 1 — CRUD de categoría
+# Entrada: POST con nombre único, GET, PATCH y DELETE.
+# Esperado: 201 al crear, 200 al consultar/actualizar, 204 al eliminar y 404 después.
+###############################################################################
+
+# @name crearCategoriaCrud
+POST {{baseUrl}}/categorias/
+Content-Type: application/json
+
+{
+  "nombre_categoria": "Categoria CRUD {{sufijo}}",
+  "descripcion": "Creada para el caso 1",
+  "activa": true
+}
+
+?? status == 201
+?? body id_categoria exists
+?? body nombre_categoria includes CRUD
+
+###
+
+# @name obtenerCategoriaCrud
+# @ref crearCategoriaCrud
+GET {{baseUrl}}/categorias/{{crearCategoriaCrud.id_categoria}}
+
+?? status == 200
+?? body id_categoria exists
+?? body cantidad_productos == 0
+
+###
+
+# @name actualizarCategoriaCrud
+# @ref crearCategoriaCrud
+PATCH {{baseUrl}}/categorias/{{crearCategoriaCrud.id_categoria}}
+Content-Type: application/json
+
+{
+  "descripcion": "Categoria actualizada",
+  "activa": false
+}
+
+?? status == 200
+?? body descripcion includes actualizada
+?? body activa == false
+
+###
+
+# @name eliminarCategoriaCrud
+# @ref crearCategoriaCrud
+DELETE {{baseUrl}}/categorias/{{crearCategoriaCrud.id_categoria}}
+
+?? status == 204
+
+###
+
+# @name obtenerCategoriaEliminada
+# @ref crearCategoriaCrud
+GET {{baseUrl}}/categorias/{{crearCategoriaCrud.id_categoria}}
+
+?? status == 404
+?? js response.parsedBody.error.code == RESOURCE_NOT_FOUND
+
+###############################################################################
+# CASO 2 — CRUD de producto
+# Entrada: categoría auxiliar, POST/GET/PATCH/DELETE de producto.
+# Esperado: 201, 200, 200, 204 y 404 después de eliminar.
+###############################################################################
+
+# @name crearCategoriaProducto
+POST {{baseUrl}}/categorias/
+Content-Type: application/json
+
+{
+  "nombre_categoria": "Categoria Producto {{sufijo}}",
+  "descripcion": "Categoría auxiliar para el caso 2",
+  "activa": true
+}
+
+?? status == 201
+
+###
+
+# @name crearProductoCrud
+# @ref crearCategoriaProducto
+POST {{baseUrl}}/productos/
+Content-Type: application/json
+
+{
+  "nombre_producto": "Producto CRUD {{sufijo}}",
+  "descripcion": "Creado para el caso 2",
+  "stock": 10,
+  "stock_minimo": 2,
+  "id_categoria": "{{crearCategoriaProducto.id_categoria}}",
+  "precio": 1500
+}
+
+?? status == 201
+?? body id_producto exists
+?? body stock == 10
+
+###
+
+# @name obtenerProductoCrud
+# @ref crearProductoCrud
+GET {{baseUrl}}/productos/{{crearProductoCrud.id_producto}}
+
+?? status == 200
+?? body stock == 10
+?? body precio == 1500
+
+###
+
+# @name actualizarProductoCrud
+# @ref crearProductoCrud
+PATCH {{baseUrl}}/productos/{{crearProductoCrud.id_producto}}
+Content-Type: application/json
+
+{
+  "stock": 7
+}
+
+?? status == 200
+?? body stock == 7
+
+###
+
+# @name eliminarProductoCrud
+# @ref crearProductoCrud
+DELETE {{baseUrl}}/productos/{{crearProductoCrud.id_producto}}
+
+?? status == 204
+
+###
+
+# @name obtenerProductoEliminado
+# @ref crearProductoCrud
+GET {{baseUrl}}/productos/{{crearProductoCrud.id_producto}}
+
+?? status == 404
+?? js response.parsedBody.error.code == RESOURCE_NOT_FOUND
+
+###
+
+# @name eliminarCategoriaProducto
+# @ref crearCategoriaProducto
+DELETE {{baseUrl}}/categorias/{{crearCategoriaProducto.id_categoria}}
+
+?? status == 204
+
+###############################################################################
+# CASO 3 — Validación inválida
+# Entrada: POST /productos/ con body vacío.
+# Esperado: 422 VALIDATION_ERROR con detalles de campos faltantes.
+###############################################################################
+
+# @name productoInvalido
+POST {{baseUrl}}/productos/
+Content-Type: application/json
+
+{}
+
+?? status == 422
+?? js response.parsedBody.error.code == VALIDATION_ERROR
+?? js response.parsedBody.error.details.length > 0
+
+###############################################################################
+# CASO 4 — Recurso inexistente
+# Entrada: GET de una categoría con UUID que no existe.
+# Esperado: 404 RESOURCE_NOT_FOUND.
+###############################################################################
+
+# @name categoriaInexistente
+GET {{baseUrl}}/categorias/00000000-0000-0000-0000-000000000000
+
+?? status == 404
+?? js response.parsedBody.error.code == RESOURCE_NOT_FOUND
+
+###############################################################################
+# CASO 5 — Regla de negocio: stock insuficiente
+# Entrada: producto con stock 1 y venta que solicita 2 unidades.
+# Esperado: 400 BUSINESS_RULE_VIOLATION.
+###############################################################################
+
+# @name crearCategoriaStock
+POST {{baseUrl}}/categorias/
+Content-Type: application/json
+
+{
+  "nombre_categoria": "Categoria Stock {{sufijo}}",
+  "descripcion": "Categoría auxiliar para el caso 5",
+  "activa": true
+}
+
+?? status == 201
+
+###
+
+# @name crearProductoStock
+# @ref crearCategoriaStock
+POST {{baseUrl}}/productos/
+Content-Type: application/json
+
+{
+  "nombre_producto": "Producto Stock {{sufijo}}",
+  "descripcion": "Stock insuficiente para el caso 5",
+  "stock": 1,
+  "stock_minimo": 1,
+  "id_categoria": "{{crearCategoriaStock.id_categoria}}",
+  "precio": 1000
+}
+
+?? status == 201
+
+###
+
+# @name ventaSinStock
+# @ref crearProductoStock
+POST {{baseUrl}}/ventas
+Content-Type: application/json
+
+{
+  "cliente": "Cliente Sin Stock {{sufijo}}",
+  "detalles": [
+    {
+      "id_producto": "{{crearProductoStock.id_producto}}",
+      "cantidad_producto": 2
+    }
+  ]
+}
+
+?? status == 400
+?? js response.parsedBody.error.code == BUSINESS_RULE_VIOLATION
+
+###
+
+# @name limpiarProductoStock
+# @ref crearProductoStock
+DELETE {{baseUrl}}/productos/{{crearProductoStock.id_producto}}
+
+?? status == 204
+
+###
+
+# @name limpiarCategoriaStock
+# @ref crearCategoriaStock
+DELETE {{baseUrl}}/categorias/{{crearCategoriaStock.id_categoria}}
+
+?? status == 204
+
+###############################################################################
+# CASO 6 — Consulta con filtro, orden y paginación
+# Entrada: 3 productos con precios 100, 300 y 200; filtro por nombre,
+#          orden descendente por precio, página 1 con límite 2.
+# Esperado: total 3, total_paginas 2, items [300, 200]; página 2 con [100].
+###############################################################################
+
+# @name crearCategoriaFiltro
+POST {{baseUrl}}/categorias/
+Content-Type: application/json
+
+{
+  "nombre_categoria": "Categoria Filtro {{sufijo}}",
+  "descripcion": "Categoría auxiliar para el caso 6",
+  "activa": true
+}
+
+?? status == 201
+
+###
+
+# @name crearProductoFiltroA
+# @ref crearCategoriaFiltro
+POST {{baseUrl}}/productos/
+Content-Type: application/json
+
+{
+  "nombre_producto": "Filtro-{{sufijo}}-A",
+  "descripcion": "Producto A para filtro",
+  "stock": 10,
+  "stock_minimo": 1,
+  "id_categoria": "{{crearCategoriaFiltro.id_categoria}}",
+  "precio": 100
+}
+
+?? status == 201
+
+###
+
+# @name crearProductoFiltroB
+# @ref crearCategoriaFiltro
+POST {{baseUrl}}/productos/
+Content-Type: application/json
+
+{
+  "nombre_producto": "Filtro-{{sufijo}}-B",
+  "descripcion": "Producto B para filtro",
+  "stock": 10,
+  "stock_minimo": 1,
+  "id_categoria": "{{crearCategoriaFiltro.id_categoria}}",
+  "precio": 300
+}
+
+?? status == 201
+
+###
+
+# @name crearProductoFiltroC
+# @ref crearCategoriaFiltro
+POST {{baseUrl}}/productos/
+Content-Type: application/json
+
+{
+  "nombre_producto": "Filtro-{{sufijo}}-C",
+  "descripcion": "Producto C para filtro",
+  "stock": 10,
+  "stock_minimo": 1,
+  "id_categoria": "{{crearCategoriaFiltro.id_categoria}}",
+  "precio": 200
+}
+
+?? status == 201
+
+###
+
+# @name consultaFiltroPagina1
+# @ref crearProductoFiltroA
+# @ref crearProductoFiltroB
+# @ref crearProductoFiltroC
+GET {{baseUrl}}/productos/?nombre=Filtro-{{sufijo}}&ordenar_por=precio&direccion=desc&pagina=1&limite=2
+
+?? status == 200
+?? js response.parsedBody.total == 3
+?? js response.parsedBody.total_paginas == 2
+?? js response.parsedBody.pagina == 1
+?? js response.parsedBody.limite == 2
+?? js response.parsedBody.items.length == 2
+?? js response.parsedBody.items[0].precio == 300
+?? js response.parsedBody.items[1].precio == 200
+
+###
+
+# @name consultaFiltroPagina2
+# @ref crearProductoFiltroA
+# @ref crearProductoFiltroB
+# @ref crearProductoFiltroC
+GET {{baseUrl}}/productos/?nombre=Filtro-{{sufijo}}&ordenar_por=precio&direccion=desc&pagina=2&limite=2
+
+?? status == 200
+?? js response.parsedBody.total == 3
+?? js response.parsedBody.total_paginas == 2
+?? js response.parsedBody.items.length == 1
+?? js response.parsedBody.items[0].precio == 100
+
+###
+
+# @name limpiarProductoFiltroA
+# @ref crearProductoFiltroA
+DELETE {{baseUrl}}/productos/{{crearProductoFiltroA.id_producto}}
+
+?? status == 204
+
+###
+
+# @name limpiarProductoFiltroB
+# @ref crearProductoFiltroB
+DELETE {{baseUrl}}/productos/{{crearProductoFiltroB.id_producto}}
+
+?? status == 204
+
+###
+
+# @name limpiarProductoFiltroC
+# @ref crearProductoFiltroC
+DELETE {{baseUrl}}/productos/{{crearProductoFiltroC.id_producto}}
+
+?? status == 204
+
+###
+
+# @name limpiarCategoriaFiltro
+# @ref crearCategoriaFiltro
+DELETE {{baseUrl}}/categorias/{{crearCategoriaFiltro.id_categoria}}
+
+?? status == 204
+
+###############################################################################
+# CASO 7 — Persistencia de datos
+# Entrada: crear categoría, producto y venta; luego recuperar la venta por su ID.
+# Esperado: la venta creada se puede leer después con el mismo cliente y total,
+#           lo que demuestra que los datos quedaron persistidos en la base.
+###############################################################################
+
+# @name crearCategoriaPersistencia
+POST {{baseUrl}}/categorias/
+Content-Type: application/json
+
+{
+  "nombre_categoria": "Categoria Persistencia {{sufijo}}",
+  "descripcion": "Categoría auxiliar para el caso 7",
+  "activa": true
+}
+
+?? status == 201
+
+###
+
+# @name crearProductoPersistencia
+# @ref crearCategoriaPersistencia
+POST {{baseUrl}}/productos/
+Content-Type: application/json
+
+{
+  "nombre_producto": "Producto Persistencia {{sufijo}}",
+  "descripcion": "Producto para el caso 7",
+  "stock": 5,
+  "stock_minimo": 1,
+  "id_categoria": "{{crearCategoriaPersistencia.id_categoria}}",
+  "precio": 1000
+}
+
+?? status == 201
+
+###
+
+# @name crearVentaPersistencia
+# @ref crearProductoPersistencia
+POST {{baseUrl}}/ventas
+Content-Type: application/json
+
+{
+  "cliente": "Cliente Persistencia {{sufijo}}",
+  "detalles": [
+    {
+      "id_producto": "{{crearProductoPersistencia.id_producto}}",
+      "cantidad_producto": 2
+    }
+  ]
+}
+
+?? status == 201
+?? body id_venta exists
+?? js response.parsedBody.total == 2000
+?? js response.parsedBody.detalles.length == 1
+
+###
+
+# @name leerVentaPersistida
+# @ref crearVentaPersistencia
+GET {{baseUrl}}/ventas/{{crearVentaPersistencia.id_venta}}
+
+?? status == 200
+?? js response.parsedBody.id_venta exists
+?? js response.parsedBody.total == 2000
+?? js response.parsedBody.cliente includes Persistencia
+?? js response.parsedBody.detalles.length == 1
+
+###
+
+# @name boletaVentaPersistida
+# @ref crearVentaPersistencia
+GET {{baseUrl}}/ventas/{{crearVentaPersistencia.id_venta}}/boleta
+
+?? status == 200
+?? js response.parsedBody.total == 2000
+?? js response.parsedBody.items.length == 1
+
+###
+
+# @name limpiarVentaPersistencia
+# @ref crearVentaPersistencia
+DELETE {{baseUrl}}/ventas/{{crearVentaPersistencia.id_venta}}
+
+?? status == 204
+
+###
+
+# @name limpiarProductoPersistencia
+# @ref crearProductoPersistencia
+DELETE {{baseUrl}}/productos/{{crearProductoPersistencia.id_producto}}
+
+?? status == 204
+
+###
+
+# @name limpiarCategoriaPersistencia
+# @ref crearCategoriaPersistencia
+DELETE {{baseUrl}}/categorias/{{crearCategoriaPersistencia.id_categoria}}
+
+?? status == 204
+
+###############################################################################
+# CASO 8 — Reglas de negocio de pago
+# Entrada: venta con total 100; pago con monto incorrecto, pago correcto,
+#          segundo pago sobre la misma venta e intento de eliminar la venta pagada.
+# Esperado: 400 por monto incorrecto, 201 al pagar, 400 por pago duplicado y
+#           409 al intentar eliminar una venta ya pagada.
+# Nota: este caso deja una venta pagada en la base aislada de pruebas; el script
+#       de ejecución elimina la base completa al terminar.
+###############################################################################
+
+# @name crearCategoriaPago
+POST {{baseUrl}}/categorias/
+Content-Type: application/json
+
+{
+  "nombre_categoria": "Categoria Pago {{sufijo}}",
+  "descripcion": "Categoría auxiliar para el caso 8",
+  "activa": true
+}
+
+?? status == 201
+
+###
+
+# @name crearProductoPago
+# @ref crearCategoriaPago
+POST {{baseUrl}}/productos/
+Content-Type: application/json
+
+{
+  "nombre_producto": "Producto Pago {{sufijo}}",
+  "descripcion": "Producto para el caso 8",
+  "stock": 10,
+  "stock_minimo": 1,
+  "id_categoria": "{{crearCategoriaPago.id_categoria}}",
+  "precio": 100
+}
+
+?? status == 201
+
+###
+
+# @name crearVentaPago
+# @ref crearProductoPago
+POST {{baseUrl}}/ventas
+Content-Type: application/json
+
+{
+  "cliente": "Cliente Pago {{sufijo}}",
+  "detalles": [
+    {
+      "id_producto": "{{crearProductoPago.id_producto}}",
+      "cantidad_producto": 1
+    }
+  ]
+}
+
+?? status == 201
+?? js response.parsedBody.total == 100
+
+###
+
+# @name pagoMontoIncorrecto
+# @ref crearVentaPago
+POST {{baseUrl}}/pagos
+Content-Type: application/json
+
+{
+  "id_venta": "{{crearVentaPago.id_venta}}",
+  "monto": 50,
+  "metodo_pago": "debito"
+}
+
+?? status == 400
+?? js response.parsedBody.error.code == BUSINESS_RULE_VIOLATION
+
+###
+
+# @name pagoCorrecto
+# @ref crearVentaPago
+POST {{baseUrl}}/pagos
+Content-Type: application/json
+
+{
+  "id_venta": "{{crearVentaPago.id_venta}}",
+  "monto": 100,
+  "metodo_pago": "debito"
+}
+
+?? status == 201
+?? body id_pago exists
+?? js response.parsedBody.estado_pago == exitoso
+?? js response.parsedBody.id_venta exists
+
+###
+
+# @name pagoDuplicado
+# @ref crearVentaPago
+POST {{baseUrl}}/pagos
+Content-Type: application/json
+
+{
+  "id_venta": "{{crearVentaPago.id_venta}}",
+  "monto": 100,
+  "metodo_pago": "debito"
+}
+
+?? status == 400
+?? js response.parsedBody.error.code == BUSINESS_RULE_VIOLATION
+
+###
+
+# @name obtenerPagoCreado
+# @ref pagoCorrecto
+GET {{baseUrl}}/pagos/{{pagoCorrecto.id_pago}}
+
+?? status == 200
+?? js response.parsedBody.id_pago exists
+?? js response.parsedBody.estado_pago == exitoso
+
+###
+
+# @name ventaConPago
+# @ref crearVentaPago
+# @ref pagoCorrecto
+GET {{baseUrl}}/ventas/{{crearVentaPago.id_venta}}
+
+?? status == 200
+?? js response.parsedBody.pago.id_pago exists
+?? js response.parsedBody.pago.estado_pago == exitoso
+
+###
+
+# @name eliminarVentaPagada
+# @ref crearVentaPago
+# @ref pagoCorrecto
+DELETE {{baseUrl}}/ventas/{{crearVentaPago.id_venta}}
+
+?? status == 409
+?? js response.parsedBody.error.code == CONFLICT
