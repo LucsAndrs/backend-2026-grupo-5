@@ -2,7 +2,7 @@
 python -m app.repositories.seeder.seed_todos
 """
 
-from app.base_datos import Base, SesionLocal, motor
+from app.base_datos import SesionLocal
 from app.models import categoria_modelos, detalle_venta_modelos, pago_modelos, producto_modelos, venta_modelos
 from app.repositories.seeder.seed_categorias import seedear_categorias
 from app.repositories.seeder.seed_detalles_ventas import seedear_detalles_ventas
@@ -12,7 +12,6 @@ from app.repositories.seeder.seed_ventas import seedear_ventas
 
 
 def seedear_todo() -> dict[str, int]:
-    Base.metadata.create_all(bind=motor)
     bd = SesionLocal()
     try:
         resultados = {

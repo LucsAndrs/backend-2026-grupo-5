@@ -114,7 +114,7 @@ uv run python -m app.repositories.seeder.seed_todos
 docker compose exec api python -m app.repositories.seeder.seed_todos
 ```
 
-`seed_todos` inserta 5 categorías, 2 productos, 2 ventas, 4 detalles y 2 pagos demo. Orden: categorías → productos → ventas → detalles → pagos. También ejecuta `Base.metadata.create_all`; en PostgreSQL se recomienda migrar primero.
+`seed_todos` inserta 5 categorías, 2 productos, 2 ventas, 4 detalles y 2 pagos demo. Orden: categorías → productos → ventas → detalles → pagos. Requiere que las tablas existan: ejecuta `alembic upgrade head` antes de sembrar (el contenedor de la API ya lo hace al iniciar).
 
 ## Estructura y capas
 
