@@ -5,7 +5,7 @@ from ..base_datos import obtener_bd
 from ..schemas.productos_schemas import ProductoCreate, ProductoPatch, ProductoResponse
 from ..domain.productos import Producto
 from ..schemas.common import PaginatedResponse
-from ..services.productos_service import producto_service
+from ..services.productos_servicio import producto_service
 
 router = APIRouter(prefix="/productos", tags=["Productos"])
 
