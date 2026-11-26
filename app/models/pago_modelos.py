@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Date, Float, ForeignKey, String
+from sqlalchemy import Column, Date, Float, ForeignKey, Index, String, text
 from app.base_datos import Base
 
 
@@ -16,3 +16,13 @@ class PagoBD(Base):
     monto = Column(Float, nullable=False)
     metodo_pago = Column(String(30), nullable=False)
     estado_pago = Column(String(20), nullable=False)
+
+    __table_args__ = (
+        Index(
+            "uq_pagos_id_venta_exitosa",
+            "id_venta",
+            unique=True,
+            sqlite_where=text("estado_pago = 'exitoso'"),
+            postgresql_where=text("estado_pago = 'exitoso'"),
+        ),
+    )

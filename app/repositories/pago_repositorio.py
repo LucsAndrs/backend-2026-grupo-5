@@ -1,7 +1,21 @@
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
-from app.domain.pago import EstadoPago, Pago
+from app.domain.pago import EstadoPago, MetodoPago, Pago
+from app.excepciones import ConflictError
 from app.models.pago_modelos import PagoBD
+
+
+MENSAJE_PAGO_DUPLICADO = "La venta ya se encuentra pagada"
+
+
+def _es_pago_exitoso_duplicado(exc: IntegrityError) -> bool:
+    detalle = str(exc.orig) if exc.orig is not None else str(exc)
+    detalle = detalle.lower()
+    return (
+        "uq_pagos_id_venta_exitosa" in detalle
+        or "unique constraint failed: pagos.id_venta" in detalle
+    )
 
 
 class PagoRepositorio:
@@ -11,12 +25,18 @@ class PagoRepositorio:
             id_venta=pago.id_venta,
             fecha_pago=pago.fecha_pago,
             monto=pago.monto,
-            metodo_pago=pago.metodo_pago,
+            metodo_pago=pago.metodo_pago.value,
             estado_pago=pago.estado_pago.value,
         )
-        bd.add(pago_bd)
-        bd.commit()
-        bd.refresh(pago_bd)
+        try:
+            bd.add(pago_bd)
+            bd.commit()
+            bd.refresh(pago_bd)
+        except IntegrityError as exc:
+            bd.rollback()
+            if _es_pago_exitoso_duplicado(exc):
+                raise ConflictError(MENSAJE_PAGO_DUPLICADO) from exc
+            raise
         return self._a_entidad(pago_bd)
 
     def obtener_por_id(self, bd: Session, id_pago: str) -> Pago | None:
@@ -57,7 +77,7 @@ class PagoRepositorio:
             id_venta=pago_bd.id_venta,
             fecha_pago=pago_bd.fecha_pago,
             monto=pago_bd.monto,
-            metodo_pago=pago_bd.metodo_pago,
+            metodo_pago=MetodoPago(pago_bd.metodo_pago),
             estado_pago=EstadoPago(pago_bd.estado_pago),
         )
 
