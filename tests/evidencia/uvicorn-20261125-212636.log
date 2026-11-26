@@ -1,0 +1,59 @@
+INFO:     127.0.0.1:49465 - "GET /openapi.json HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49469 - "POST /categorias/ HTTP/1.1" 201 Created
+INFO:     127.0.0.1:49469 - "GET /categorias/785d69d3-51f2-44cd-a906-3c07094890a7 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49469 - "PATCH /categorias/785d69d3-51f2-44cd-a906-3c07094890a7 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49469 - "DELETE /categorias/785d69d3-51f2-44cd-a906-3c07094890a7 HTTP/1.1" 204 No Content
+INFO:     127.0.0.1:49469 - "GET /categorias/785d69d3-51f2-44cd-a906-3c07094890a7 HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49469 - "POST /categorias/ HTTP/1.1" 201 Created
+INFO:     127.0.0.1:49469 - "POST /productos/ HTTP/1.1" 201 Created
+INFO:     127.0.0.1:49469 - "GET /productos/088d590e-7289-4496-938b-5adc40b062c3 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49469 - "PATCH /productos/088d590e-7289-4496-938b-5adc40b062c3 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49469 - "DELETE /productos/088d590e-7289-4496-938b-5adc40b062c3 HTTP/1.1" 204 No Content
+INFO:     127.0.0.1:49469 - "GET /productos/088d590e-7289-4496-938b-5adc40b062c3 HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49469 - "DELETE /categorias/8331e656-478c-49dc-b1a9-a150c4fb5376 HTTP/1.1" 204 No Content
+INFO:     127.0.0.1:49469 - "POST /productos/ HTTP/1.1" 422 Unprocessable Content
+INFO:     127.0.0.1:49469 - "GET /categorias/00000000-0000-0000-0000-000000000000 HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49469 - "POST /categorias/ HTTP/1.1" 201 Created
+INFO:     127.0.0.1:49469 - "POST /productos/ HTTP/1.1" 201 Created
+INFO:     127.0.0.1:49469 - "POST /ventas HTTP/1.1" 400 Bad Request
+INFO:     127.0.0.1:49469 - "DELETE /productos/5b5bda39-c50b-42c8-97ee-6d809ea67171 HTTP/1.1" 204 No Content
+INFO:     127.0.0.1:49469 - "DELETE /categorias/ee4f6355-a322-4113-835f-9a02977ac80e HTTP/1.1" 204 No Content
+INFO:     127.0.0.1:49469 - "POST /categorias/ HTTP/1.1" 201 Created
+INFO:     127.0.0.1:49469 - "POST /productos/ HTTP/1.1" 201 Created
+INFO:     127.0.0.1:49469 - "POST /productos/ HTTP/1.1" 201 Created
+INFO:     127.0.0.1:49469 - "POST /productos/ HTTP/1.1" 201 Created
+INFO:     127.0.0.1:49469 - "GET /productos/?nombre=Filtro-1795652801756&ordenar_por=precio&direccion=desc&pagina=1&limite=2 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49469 - "GET /productos/?nombre=Filtro-1795652801756&ordenar_por=precio&direccion=desc&pagina=2&limite=2 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49469 - "DELETE /productos/21a05c56-2bcc-42fd-94e0-5575a4317867 HTTP/1.1" 204 No Content
+INFO:     127.0.0.1:49469 - "DELETE /productos/18392e4a-1568-41ff-a3e4-2c618cda5c04 HTTP/1.1" 204 No Content
+INFO:     127.0.0.1:49469 - "DELETE /productos/c289188c-40fa-4d0e-b42f-81ec93306ee3 HTTP/1.1" 204 No Content
+INFO:     127.0.0.1:49469 - "DELETE /categorias/f3fcfaf7-d09b-4692-8a0f-3c241952b682 HTTP/1.1" 204 No Content
+INFO:     127.0.0.1:49469 - "POST /categorias/ HTTP/1.1" 201 Created
+INFO:     127.0.0.1:49469 - "POST /productos/ HTTP/1.1" 201 Created
+INFO:     127.0.0.1:49469 - "POST /ventas HTTP/1.1" 201 Created
+INFO:     127.0.0.1:49469 - "GET /ventas/56ca4429-7a9a-4397-8e02-2aca2c9bbdd6 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49469 - "GET /ventas/56ca4429-7a9a-4397-8e02-2aca2c9bbdd6/boleta HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49469 - "DELETE /ventas/56ca4429-7a9a-4397-8e02-2aca2c9bbdd6 HTTP/1.1" 204 No Content
+INFO:     127.0.0.1:49469 - "DELETE /productos/e2f5abff-6090-4c51-9b27-120908832ef5 HTTP/1.1" 204 No Content
+INFO:     127.0.0.1:49469 - "DELETE /categorias/85cecb1d-2439-4019-985c-a21eb54e81e7 HTTP/1.1" 204 No Content
+INFO:     127.0.0.1:49469 - "POST /categorias/ HTTP/1.1" 201 Created
+INFO:     127.0.0.1:49469 - "POST /productos/ HTTP/1.1" 201 Created
+INFO:     127.0.0.1:49469 - "POST /ventas HTTP/1.1" 201 Created
+INFO:     127.0.0.1:49469 - "POST /pagos HTTP/1.1" 400 Bad Request
+INFO:     127.0.0.1:49469 - "POST /pagos HTTP/1.1" 201 Created
+INFO:     127.0.0.1:49469 - "POST /pagos HTTP/1.1" 409 Conflict
+INFO:     127.0.0.1:49469 - "GET /pagos/1e01ca8a-d418-4a8d-9650-789a924200d7 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49469 - "GET /ventas/2a4af334-8c5b-4295-b6a4-e4c445783888 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49469 - "DELETE /ventas/2a4af334-8c5b-4295-b6a4-e4c445783888 HTTP/1.1" 409 Conflict
+INFO:     127.0.0.1:49469 - "POST /pagos HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49469 - "POST /pagos HTTP/1.1" 422 Unprocessable Content
+INFO:     127.0.0.1:49469 - "POST /pagos HTTP/1.1" 422 Unprocessable Content
+INFO:     127.0.0.1:49469 - "POST /pagos HTTP/1.1" 422 Unprocessable Content
+INFO:     127.0.0.1:49469 - "GET /pagos HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49469 - "GET /pagos/00000000-0000-0000-0000-000000000000 HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49473 - "POST /categorias/ HTTP/1.1" 201 Created
+INFO:     127.0.0.1:49474 - "POST /productos/ HTTP/1.1" 201 Created
+INFO:     127.0.0.1:49475 - "POST /ventas HTTP/1.1" 201 Created
+INFO:     127.0.0.1:49477 - "POST /pagos HTTP/1.1" 201 Created
+INFO:     127.0.0.1:49476 - "POST /pagos HTTP/1.1" 409 Conflict
+INFO:     127.0.0.1:49478 - "GET /pagos HTTP/1.1" 200 OK

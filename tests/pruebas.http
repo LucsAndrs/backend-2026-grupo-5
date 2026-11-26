@@ -519,7 +519,7 @@ DELETE {{baseUrl}}/categorias/{{crearCategoriaPersistencia.id_categoria}}
 # CASO 8 — Reglas de negocio de pago
 # Entrada: venta con total 100; pago con monto incorrecto, pago correcto,
 #          segundo pago sobre la misma venta e intento de eliminar la venta pagada.
-# Esperado: 400 por monto incorrecto, 201 al pagar, 400 por pago duplicado y
+# Esperado: 400 por monto incorrecto, 201 al pagar, 409 por pago duplicado y
 #           409 al intentar eliminar una venta ya pagada.
 # Nota: este caso deja una venta pagada en la base aislada de pruebas; el script
 #       de ejecución elimina la base completa al terminar.
@@ -622,8 +622,8 @@ Content-Type: application/json
   "metodo_pago": "debito"
 }
 
-?? status == 400
-?? js response.parsedBody.error.code == BUSINESS_RULE_VIOLATION
+?? status == 409
+?? js response.parsedBody.error.code == CONFLICT
 
 ###
 
@@ -655,3 +655,90 @@ DELETE {{baseUrl}}/ventas/{{crearVentaPago.id_venta}}
 
 ?? status == 409
 ?? js response.parsedBody.error.code == CONFLICT
+
+###############################################################################
+# CASO 9 — Validaciones adicionales de pagos
+# Entrada: venta inexistente, montos inválidos, método inválido, ID vacío,
+#          listado y consulta de un pago inexistente.
+# Esperado: 404 para recursos inexistentes, 422 para errores de esquema y
+#           200 con la lista de pagos.
+###############################################################################
+
+# @name pagoVentaInexistente
+POST {{baseUrl}}/pagos
+Content-Type: application/json
+
+{
+  "id_venta": "00000000-0000-0000-0000-000000000000",
+  "monto": 100,
+  "metodo_pago": "debito"
+}
+
+?? status == 404
+?? js response.parsedBody.error.code == RESOURCE_NOT_FOUND
+
+###
+
+# @name pagoMontoNegativo
+# @ref crearVentaPago
+POST {{baseUrl}}/pagos
+Content-Type: application/json
+
+{
+  "id_venta": "{{crearVentaPago.id_venta}}",
+  "monto": -50,
+  "metodo_pago": "debito"
+}
+
+?? status == 422
+?? js response.parsedBody.error.code == VALIDATION_ERROR
+?? js response.parsedBody.error.details.length > 0
+
+###
+
+# @name pagoMetodoInvalido
+# @ref crearVentaPago
+POST {{baseUrl}}/pagos
+Content-Type: application/json
+
+{
+  "id_venta": "{{crearVentaPago.id_venta}}",
+  "monto": 100,
+  "metodo_pago": "paypal"
+}
+
+?? status == 422
+?? js response.parsedBody.error.code == VALIDATION_ERROR
+?? js response.parsedBody.error.details.length > 0
+
+###
+
+# @name pagoIdVentaVacio
+POST {{baseUrl}}/pagos
+Content-Type: application/json
+
+{
+  "id_venta": "   ",
+  "monto": 100,
+  "metodo_pago": "debito"
+}
+
+?? status == 422
+?? js response.parsedBody.error.code == VALIDATION_ERROR
+
+###
+
+# @name listarPagos
+GET {{baseUrl}}/pagos
+
+?? status == 200
+?? js response.parsedBody.length > 0
+?? js response.parsedBody[0].estado_pago == exitoso
+
+###
+
+# @name pagoInexistente
+GET {{baseUrl}}/pagos/00000000-0000-0000-0000-000000000000
+
+?? status == 404
+?? js response.parsedBody.error.code == RESOURCE_NOT_FOUND

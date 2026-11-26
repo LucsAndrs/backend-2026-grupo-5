@@ -9,11 +9,17 @@ class EstadoPago(str, Enum):
     EXITOSO = "exitoso"
     RECHAZADO = "rechazado"
 
+
+class MetodoPago(str, Enum):
+    DEBITO = "debito"
+    CREDITO = "credito"
+
+
 @dataclass
 class Pago:
-    id_venta: str 
+    id_venta: str
     fecha_pago: date
     monto: float
-    metodo_pago: str
-    estado_pago: EstadoPago 
+    metodo_pago: MetodoPago
+    estado_pago: EstadoPago
     id_pago: str = field(default_factory=lambda: str(uuid.uuid4()))

@@ -201,9 +201,9 @@ Errores uniformes:
 | `DELETE` | `/ventas/{id_venta}` | → sin contenido | 204, 404, 409 |
 | `GET` | `/ventas/{id_venta}/detalles` | → `list[DetalleVenta]` | 200 |
 | `GET` | `/ventas/{id_venta}/detalles/{id_detalle}` | → `DetalleVenta` | 200, 404 |
-| `POST` | `/pagos` | `CrearPago` → `PagoRespuesta` | 201, 400, 404, 422 |
+| `POST` | `/pagos` | `CrearPago` → `PagoRespuesta` | 201, 400, 404, 409, 422 |
 | `GET` | `/pagos` | → `list[PagoRespuesta]` | 200 |
-| `GET` | `/pagos/{id_pago}` | → `PagoRespuesta` | 200, 404 |
+| `GET` | `/pagos/{id_pago}` | → `PagoRespuesta` | 200, 404, 422 |
 
 Bodies principales:
 
@@ -223,7 +223,7 @@ Bodies principales:
 
 Listados: `pagina` (≥1, default 1), `limite` (1–100, default 20), `direccion` (`asc`/`desc`). Categorías: `activa`, `nombre`, `ordenar_por` (default `nombre_categoria`). Productos: `id_categoria`, `nombre`, `ordenar_por` (default `nombre_producto`). Ventas: `cliente`, `ordenar_por` (`cliente`/`total`/`fecha_venta`).
 
-Reglas: cantidad > 0, stock suficiente y acumulado, stock se descuenta al vender y se repone al eliminar, venta pagada no se elimina (409); pago debe existir la venta, monto igual al total y solo un pago exitoso por venta.
+Reglas: cantidad > 0, stock suficiente y acumulado, stock se descuenta al vender y se repone al eliminar, venta pagada no se elimina (409); el pago requiere una venta existente (404) y un monto igual al total (400, `BUSINESS_RULE_VIOLATION`). Solo se permite un pago exitoso por venta: un segundo intento devuelve 409 (`CONFLICT`), y un índice único parcial en `pagos(id_venta)` donde `estado_pago = 'exitoso'` lo garantiza también ante solicitudes simultáneas en SQLite y PostgreSQL.
 
 ## OpenAPI
 
@@ -239,9 +239,10 @@ PY
 
 ## Ejecución de pruebas
 
-Hay una colección `.http` con 8 casos: CRUD, validación inválida, recurso inexistente, regla de negocio, filtro/orden/paginación, persistencia y reglas de pago.
+Hay una colección `.http` con 9 casos: CRUD, validación inválida, recurso inexistente, regla de negocio, filtro/orden/paginación, persistencia, reglas de pago y validaciones adicionales de pago. El script además ejecuta una verificación de pagos simultáneos.
 
 - Colección: `tests/pruebas.http`
+- Verificación de concurrencia: `tests/verificar_concurrencia_pagos.py`
 - Evidencia y explicación del aislamiento: `tests/EVIDENCIA.md`
 - Ejecución automatizada sobre SQLite temporal: `tests/ejecutar_pruebas.sh`
 

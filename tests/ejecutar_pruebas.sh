@@ -79,6 +79,12 @@ fi
 set +e
 npx --yes httpyac send tests/pruebas.http --all --no-color --var baseUrl="$BASE_URL" 2>&1 | tee -a "$LOG"
 ESTADO=${PIPESTATUS[0]}
+
+"$RAIZ/.venv/bin/python" tests/verificar_concurrencia_pagos.py "$BASE_URL" 2>&1 | tee -a "$LOG"
+ESTADO_CONCURRENCIA=${PIPESTATUS[0]}
+if [[ "$ESTADO" -eq 0 ]]; then
+  ESTADO=$ESTADO_CONCURRENCIA
+fi
 set -e
 
 {
