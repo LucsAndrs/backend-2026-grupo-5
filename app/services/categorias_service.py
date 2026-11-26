@@ -23,9 +23,10 @@ class CategoriaService:
             cantidad_productos=producto_repositorio.contar_por_categoria(bd, categoria.id_categoria),
         )
 
-    def crear(self, bd: Session, categoria: CategoriaCreate) -> Categoria:
+    def crear(self, bd: Session, categoria: CategoriaCreate) -> CategoriaResponse:
         entidad = Categoria(**categoria.model_dump())
-        return categoria_repositorio.crear(bd, entidad)
+        creada = categoria_repositorio.crear(bd, entidad)
+        return self._a_categoria_response(bd, creada)
 
     def obtener_categorias( self,
                             bd: Session,
