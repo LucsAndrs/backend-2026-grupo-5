@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 from ..base_datos import obtener_bd
 from ..schemas.common import PaginatedResponse
 from ..schemas.productos_schemas import ProductoCreate, ProductoPatch, ProductoResponse
-from ..services.productos_service import producto_service
+from ..services.productos_servicio import producto_service
 
 router = APIRouter(prefix="/productos", tags=["Productos"])
 

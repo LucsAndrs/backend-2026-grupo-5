@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 from ..base_datos import obtener_bd
 from ..schemas.categorias_schemas import CategoriaCreate, CategoriaPatch, CategoriaResponse
 from ..schemas.common import PaginatedResponse
-from ..services.categorias_service import categoria_service
+from ..services.categorias_servicio import categoria_service
 
 router = APIRouter(prefix="/categorias", tags=["Categorias"])
 
