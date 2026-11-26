@@ -1,7 +1,10 @@
 from sqlalchemy import func
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
-from ..excepciones import ConflictError, ResourceNotFoundError
+
 from ..domain.productos import Producto
+from ..excepciones import ConflictError, ResourceNotFoundError
+from ..models.detalle_venta_modelos import DetalleVentaBD
 from ..models.producto_modelos import ProductoBD
 
 
@@ -43,8 +46,23 @@ class ProductoRepositorio:
         producto = bd.query(ProductoBD).filter(ProductoBD.id_producto == id_producto).first()
         if producto is None:
             raise ResourceNotFoundError("No existe un producto con el ID solicitado")
-        bd.delete(producto)
-        bd.commit()
+
+        detalle_asociado = bd.query(DetalleVentaBD.id_detalle).filter(
+            DetalleVentaBD.id_producto == id_producto
+        ).first()
+        if detalle_asociado is not None:
+            raise ConflictError(
+                "No se puede eliminar el producto porque está asociado a detalles de venta"
+            )
+
+        try:
+            bd.delete(producto)
+            bd.commit()
+        except IntegrityError:
+            bd.rollback()
+            raise ConflictError(
+                "No se puede eliminar el producto porque tiene relaciones asociadas"
+            )
 
     def contar_por_categoria(self, bd: Session, id_categoria: str) -> int:
         return bd.query(func.count(ProductoBD.id_producto)).filter(

@@ -26,10 +26,11 @@ class ProductoService:
             fecha_actualizacion=producto.fecha_actualizacion,
         )
 
-    def crear(self, bd: Session, datos: ProductoCreate) -> Producto:
+    def crear(self, bd: Session, datos: ProductoCreate) -> ProductoResponse:
         categoria_repositorio.obtener_por_id(bd, datos.id_categoria)
         entidad = Producto(**datos.model_dump())
-        return producto_repositorio.crear(bd, entidad)
+        creada = producto_repositorio.crear(bd, entidad)
+        return self._a_producto_response(creada)
 
     def obtener_productos(self,
                           bd: Session,

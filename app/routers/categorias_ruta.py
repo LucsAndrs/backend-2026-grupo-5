@@ -1,17 +1,18 @@
 from typing import Literal
+
 from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy.orm import Session
+
 from ..base_datos import obtener_bd
 from ..schemas.categorias_schemas import CategoriaCreate, CategoriaPatch, CategoriaResponse
-from ..domain.categorias import Categoria
 from ..schemas.common import PaginatedResponse
 from ..services.categorias_servicio import categoria_service
 
 router = APIRouter(prefix="/categorias", tags=["Categorias"])
 
 
-@router.post("/", response_model=Categoria, status_code=status.HTTP_201_CREATED)
-def crear_categoria(categoria: CategoriaCreate, bd: Session = Depends(obtener_bd)) -> Categoria:
+@router.post("/", response_model=CategoriaResponse, status_code=status.HTTP_201_CREATED)
+def crear_categoria(categoria: CategoriaCreate, bd: Session = Depends(obtener_bd)) -> CategoriaResponse:
     return categoria_service.crear(bd, categoria)
 
 

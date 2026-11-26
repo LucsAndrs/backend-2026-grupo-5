@@ -1,8 +1,11 @@
 from sqlalchemy import func
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
-from ..excepciones import ConflictError, ResourceNotFoundError
+
 from ..domain.categorias import Categoria
+from ..excepciones import ConflictError, ResourceNotFoundError
 from ..models.categoria_modelos import CategoriaBD
+from ..models.producto_modelos import ProductoBD
 
 
 class CategoriaRepositorio:
@@ -40,8 +43,23 @@ class CategoriaRepositorio:
         categoria = bd.query(CategoriaBD).filter(CategoriaBD.id_categoria == id_categoria).first()
         if categoria is None:
             raise ResourceNotFoundError("No existe una categoría con el ID solicitado")
-        bd.delete(categoria)
-        bd.commit()
+
+        productos_asociados = bd.query(ProductoBD.id_producto).filter(
+            ProductoBD.id_categoria == id_categoria
+        ).first()
+        if productos_asociados is not None:
+            raise ConflictError(
+                "No se puede eliminar la categoría porque tiene productos asociados"
+            )
+
+        try:
+            bd.delete(categoria)
+            bd.commit()
+        except IntegrityError:
+            bd.rollback()
+            raise ConflictError(
+                "No se puede eliminar la categoría porque tiene relaciones asociadas"
+            )
 
     def _a_bd(self, entidad: Categoria) -> CategoriaBD:
         return CategoriaBD(

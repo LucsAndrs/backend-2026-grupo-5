@@ -1,17 +1,18 @@
 from typing import Literal
+
 from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy.orm import Session
+
 from ..base_datos import obtener_bd
-from ..schemas.productos_schemas import ProductoCreate, ProductoPatch, ProductoResponse
-from ..domain.productos import Producto
 from ..schemas.common import PaginatedResponse
+from ..schemas.productos_schemas import ProductoCreate, ProductoPatch, ProductoResponse
 from ..services.productos_servicio import producto_service
 
 router = APIRouter(prefix="/productos", tags=["Productos"])
 
 
-@router.post("/", response_model=Producto, status_code=status.HTTP_201_CREATED)
-def crear_producto(datos: ProductoCreate, bd: Session = Depends(obtener_bd)) -> Producto:
+@router.post("/", response_model=ProductoResponse, status_code=status.HTTP_201_CREATED)
+def crear_producto(datos: ProductoCreate, bd: Session = Depends(obtener_bd)) -> ProductoResponse:
     return producto_service.crear(bd, datos)
 
 
