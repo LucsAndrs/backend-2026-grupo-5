@@ -74,6 +74,93 @@ POSTGRES_DB=backend_database
 
 Notas: sin `DATABASE_URL`, `app.base_datos` usa `sqlite:///./minimarket.db`; Alembic sí requiere `DATABASE_URL`; `.env` está en `.gitignore`.
 
+## Diagrama de clases del dominio
+
+```mermaid
+classDiagram
+    class Categoria {
+        +str id_categoria
+        +str nombre_categoria
+        +str descripcion
+        +bool activa
+        +datetime fecha_creacion
+        +datetime fecha_actualizacion
+    }
+
+    class Producto {
+        +str id_producto
+        +str nombre_producto
+        +str descripcion
+        +int stock
+        +int stock_minimo
+        +str id_categoria
+        +int precio
+        +datetime fecha_creacion
+        +datetime fecha_actualizacion
+    }
+
+    class Venta {
+        +str id_venta
+        +str cliente
+        +date fecha_venta
+        +float total
+        +list~DetalleVenta~ detalles
+    }
+
+    class DetalleVenta {
+        +str id_detalle
+        +str id_producto
+        +str id_venta
+        +int cantidad_producto
+        +int subtotal
+        +int precio_unitario
+        +float iva
+        +float descuento
+    }
+
+    class Pago {
+        +str id_pago
+        +str id_venta
+        +date fecha_pago
+        +float monto
+        +str metodo_pago
+        +EstadoPago estado_pago
+    }
+
+    class EstadoPago {
+        <<Enumeration>>
+        PENDIENTE
+        EXITOSO
+        RECHAZADO
+    }
+
+    class VentaServicio {
+        <<Service>>
+        +crear_venta(bd, datos)
+        +agregar_detalle(venta, detalle)
+        +calcular_total(venta)
+    }
+
+    class DetalleVentaServicio {
+        <<Service>>
+        +obtener_detalles_por_venta(bd, id_venta)
+        +obtener_detalle_especifico(bd, id_venta, id_detalle)
+    }
+
+    Categoria "1" -- "0..*" Producto : clasifica
+    Venta "1" *-- "0..*" DetalleVenta : contiene
+    Producto "1" -- "0..*" DetalleVenta : aparece en
+    Venta "1" -- "0..*" Pago : registra
+    Pago ..> EstadoPago : usa
+    VentaServicio ..> Venta
+    VentaServicio ..> DetalleVenta
+    DetalleVentaServicio ..> DetalleVenta
+```
+
+`POST /ventas` exige al menos un detalle, aunque la clase `Venta` puede
+inicializarse con una lista vacía. El servicio de pagos rechaza un nuevo
+pago si la venta ya tiene uno exitoso.
+
 ## Base de datos
 
 - **PostgreSQL (Docker):** imagen `postgres:16`, volumen `postgres_data` y healthcheck. Desde el host: `postgresql+psycopg://usuariouno:secreto4321@localhost:5432/backend_database`.
@@ -90,11 +177,70 @@ Tablas de la migración inicial:
 | `detalles_ventas` | Líneas de venta con FK a venta y producto. |
 | `pagos` | Pagos asociados a una venta. |
 
-```text
-categorias 1─N productos
-ventas 1─N detalles_ventas N─1 productos
-ventas 1─N pagos
+### Diagrama entidad-relación
+
+```mermaid
+erDiagram
+    categorias ||..o{ productos : clasifica
+    ventas ||..o{ detalles_ventas : contiene
+    productos ||..o{ detalles_ventas : aparece_en
+    ventas ||..o{ pagos : registra
+
+    categorias {
+        varchar id_categoria PK
+        varchar(50) nombre_categoria
+        varchar(255) descripcion
+        boolean activa
+        timestamp fecha_creacion
+        timestamp fecha_actualizacion
+    }
+
+    productos {
+        varchar id_producto PK
+        varchar(50) nombre_producto
+        varchar(255) descripcion
+        integer stock
+        integer stock_minimo
+        varchar id_categoria FK
+        integer precio
+        timestamp fecha_creacion
+        timestamp fecha_actualizacion
+    }
+
+    ventas {
+        varchar id_venta PK
+        varchar(90) cliente
+        date fecha_venta
+        float total "Admite NULL"
+    }
+
+    detalles_ventas {
+        varchar id_detalle PK
+        varchar id_producto FK
+        varchar id_venta FK
+        integer cantidad_producto
+        float subtotal
+        float precio_unitario
+        float iva
+        float descuento
+    }
+
+    pagos {
+        varchar id_pago PK
+        varchar id_venta FK
+        date fecha_pago
+        float monto
+        varchar(30) metodo_pago
+        varchar(20) estado_pago
+    }
 ```
+
+`PK` indica clave primaria y `FK` indica clave foránea. Todas las columnas
+son obligatorias salvo `ventas.total`. Las claves foráneas son obligatorias
+y quedan fuera de la clave primaria de su tabla.
+
+`pagos.id_venta` tiene un índice no único. La base admite varios pagos por
+venta, y el servicio rechaza un nuevo pago si ya existe uno exitoso.
 
 ## Migraciones y seeders
 

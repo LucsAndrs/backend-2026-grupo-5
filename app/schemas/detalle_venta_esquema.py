@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 class DetalleVentaCrear(BaseModel):
     id_producto: str
@@ -13,5 +13,7 @@ class DetalleVentaRespuesta(BaseModel):
     iva: float
     descuento: float
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
+
+class DetalleVentaConsulta(DetalleVentaRespuesta):
+    id_venta: str
