@@ -1,11 +1,13 @@
 import math
+import secrets
 from datetime import date
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.domain.venta import Venta
 from app.domain.detalleventa import DetalleVenta
-from app.schemas.venta_esquemas import VentaCreada, VentaRespuesta
-from app.excepciones import BusinessRuleError, ConflictError, ResourceNotFoundError
+from app.schemas.venta_esquemas import BoletaItem, BoletaResponse, VentaCreada, VentaRespuesta
+from app.excepciones import BusinessRuleError, ConflictError, InternalError, ResourceNotFoundError
 from app.schemas.common import PaginatedResponse
 from app.schemas.pago_schemas import PagoRespuesta
 from app.schemas.detalle_venta_esquema import DetalleVentaRespuesta
@@ -17,6 +19,17 @@ from app.repositories.pago_repositorio import pago_repositorio
 class VentaServicio:
     def __init__(self):
         self.CAMPOS_ORDEN = {"cliente", "total", "fecha_venta"}
+
+    def _generar_numero_boleta(self, bd: Session, fecha: date) -> str:
+        for _ in range(5):
+            numero = f"BOL-{fecha:%Y%m%d}-{secrets.token_hex(4).upper()}"
+            if not venta_repositorio.existe_numero_boleta(bd, numero):
+                return numero
+        raise InternalError("No fue posible generar un número de boleta único")
+
+    def _es_conflicto_numero_boleta(self, error: IntegrityError) -> bool:
+        mensaje = str(error.orig).lower()
+        return "numero_boleta" in mensaje or "uq_ventas_numero_boleta" in mensaje
 
     def calcular_total(self, venta: Venta):
         total = 0.0
@@ -42,6 +55,7 @@ class VentaServicio:
         return VentaRespuesta(
             id_venta= venta.id_venta,
             fecha_venta= venta.fecha_venta,
+            numero_boleta= venta.numero_boleta,
             cliente= venta.cliente,
             total= venta.total,
             detalles= detalles_out,
@@ -55,43 +69,59 @@ class VentaServicio:
         self.calcular_total(venta)
 
     def crear_venta(self, bd: Session, datos: VentaCreada):
-        venta = Venta(cliente=datos.cliente, fecha_venta=date.today())
-
-        productos_validados = []
-        canntidades_acumuladas = {}
-
-        for detalle_data in datos.detalles:
-            if detalle_data.cantidad_producto <= 0:
-                raise BusinessRuleError("La cantidad de producto debe ser mayor a cero")
-
-            producto = producto_repositorio.obtener_por_id(bd, detalle_data.id_producto)
-            acumulado = canntidades_acumuladas.get(producto.id_producto, 0) + detalle_data.cantidad_producto
-
-            if acumulado > producto.stock:
-                raise BusinessRuleError(
-                    f"Stock insuficiente para '{producto.nombre_producto}':"
-                    f" Disponible '{producto.stock}', solicitado'{acumulado}'"
+        fecha = date.today()
+        for intento in range(3):
+            try:
+                venta = Venta(
+                    cliente=datos.cliente,
+                    fecha_venta=fecha,
+                    numero_boleta=self._generar_numero_boleta(bd, fecha),
                 )
-            canntidades_acumuladas[producto.id_producto] = acumulado
-            productos_validados.append((producto, detalle_data))
 
-        for producto, detalle_data in productos_validados:
-            producto = producto_repositorio.obtener_por_id(bd, producto.id_producto)
-            detalle = DetalleVenta(
-                id_producto= producto.id_producto,
-                id_venta= venta.id_venta,
-                cantidad_producto= detalle_data.cantidad_producto,
-                precio_unitario= producto.precio,
-                subtotal= detalle_data.cantidad_producto * producto.precio,
-                iva= 0.0,
-                descuento= 0.0,
-            )
-            self.agregar_detalle(venta, detalle)
-            producto.stock -= detalle_data.cantidad_producto
-            producto_repositorio.actualizar(bd, producto.id_producto, producto)
+                productos_validados = []
+                canntidades_acumuladas = {}
 
-        venta_guardada = venta_repositorio.crear_venta(bd, venta)
-        return self.a_venta_out(bd, venta_guardada)
+                for detalle_data in datos.detalles:
+                    if detalle_data.cantidad_producto <= 0:
+                        raise BusinessRuleError("La cantidad de producto debe ser mayor a cero")
+
+                    producto = producto_repositorio.obtener_por_id(bd, detalle_data.id_producto)
+                    acumulado = canntidades_acumuladas.get(producto.id_producto, 0) + detalle_data.cantidad_producto
+
+                    if acumulado > producto.stock:
+                        raise BusinessRuleError(
+                            f"Stock insuficiente para '{producto.nombre_producto}':"
+                            f" Disponible '{producto.stock}', solicitado'{acumulado}'"
+                        )
+                    canntidades_acumuladas[producto.id_producto] = acumulado
+                    productos_validados.append((producto, detalle_data))
+
+                for producto, detalle_data in productos_validados:
+                    producto = producto_repositorio.obtener_por_id(bd, producto.id_producto)
+                    detalle = DetalleVenta(
+                        id_producto= producto.id_producto,
+                        id_venta= venta.id_venta,
+                        cantidad_producto= detalle_data.cantidad_producto,
+                        precio_unitario= producto.precio,
+                        subtotal= detalle_data.cantidad_producto * producto.precio,
+                        iva= 0.0,
+                        descuento= 0.0,
+                    )
+                    self.agregar_detalle(venta, detalle)
+                    producto.stock -= detalle_data.cantidad_producto
+                    producto_repositorio.actualizar(bd, producto.id_producto, producto, commit=False)
+
+                venta_guardada = venta_repositorio.crear_venta(bd, venta, commit=False)
+                bd.commit()
+                return self.a_venta_out(bd, venta_guardada)
+            except IntegrityError as error:
+                bd.rollback()
+                if not self._es_conflicto_numero_boleta(error) or intento == 2:
+                    raise
+            except Exception:
+                bd.rollback()
+                raise
+        raise ConflictError("No fue posible generar un número de boleta único")
 
     def obtener_venta(self, bd: Session, id_venta: str):
         venta = venta_repositorio.obtener_por_id(bd, id_venta)
@@ -99,22 +129,25 @@ class VentaServicio:
 
     def eliminar_venta(self, bd: Session, id_venta: str):
         venta = venta_repositorio.obtener_por_id(bd, id_venta)
+        try:
+            if pago_repositorio.existe_pago_exitoso(bd, id_venta):
+                raise ConflictError("No se puede eliminar una venta que ya fue pagada")
 
-    # TODO: 
-        if pago_repositorio.existe_pago_exitoso(bd, id_venta):
-            raise ConflictError("No se puede eliminar una venta que ya fue pagada")
+            for detalle in venta.detalles:
+                try:
+                    producto = producto_repositorio.obtener_por_id(bd, detalle.id_producto)
+                except ResourceNotFoundError:
+                    producto = None
 
-        for detalle in venta.detalles:
-            try:
-                producto = producto_repositorio.obtener_por_id(bd, detalle.id_producto)
-            except ResourceNotFoundError:
-                producto = None
+                if producto is not None:
+                    producto.stock += detalle.cantidad_producto
+                    producto_repositorio.actualizar(bd, producto.id_producto, producto, commit=False)
 
-            if producto is not None:
-                producto.stock += detalle.cantidad_producto
-                producto_repositorio.actualizar(bd, producto.id_producto, producto)
-
-        return venta_repositorio.eliminar_venta(bd, id_venta)
+            venta_repositorio.eliminar_venta(bd, id_venta, commit=False)
+            bd.commit()
+        except Exception:
+            bd.rollback()
+            raise
 
     def listar_venta(self, bd: Session, cliente: str = None, ordenar_por: str = None, direccion: str = "asc",
                     pagina: int = 1, limite: int = 20):
@@ -152,23 +185,25 @@ class VentaServicio:
             total_paginas= total_paginas,
         )
 
-    def generar_boleta(self, bd: Session, id_venta: str):
+    def generar_boleta(self, bd: Session, id_venta: str) -> BoletaResponse:
         venta = venta_repositorio.obtener_por_id(bd, id_venta)
-        items = []
-        for detalle in venta.detalles:
-            items.append({
-                "producto_id": detalle.id_producto,
-                "cantidad": detalle.cantidad_producto,
-                "precio_unitario": detalle.precio_unitario,
-                "subtotal": detalle.subtotal,
-            })
+        items = [
+            BoletaItem(
+                producto_id=detalle.id_producto,
+                cantidad=detalle.cantidad_producto,
+                precio_unitario=detalle.precio_unitario,
+                subtotal=detalle.subtotal,
+            )
+            for detalle in venta.detalles
+        ]
 
-        return {
-            "id_venta": venta.id_venta,
-            "fecha_venta": venta.fecha_venta.isoformat(),
-            "cliente": venta.cliente,
-            "items": items,
-            "total": venta.total,
-        }
+        return BoletaResponse(
+            id_venta=venta.id_venta,
+            numero_boleta=venta.numero_boleta,
+            fecha_venta=venta.fecha_venta,
+            cliente=venta.cliente,
+            items=items,
+            total=venta.total,
+        )
 
 venta_servicio = VentaServicio()

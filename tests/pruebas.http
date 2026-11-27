@@ -4,7 +4,7 @@
 #   npx --yes httpyac send tests/pruebas.http --all --no-color
 #
 # O cambiar la URL base:
-#   npx --yes httpyac send tests/pruebas.http --all --no-color --var baseUrl=http://localhost:8002
+#   npx --yes httpyac send tests/pruebas.http --all --no-color --var baseUrl=http://localhost:8001
 #   (también puede usarse --env pruebas con tests/http-client.env.json)
 #
 # La colección está pensada para httpyac: las aserciones con "??" son específicas de httpyac.
@@ -655,3 +655,404 @@ DELETE {{baseUrl}}/ventas/{{crearVentaPago.id_venta}}
 
 ?? status == 409
 ?? js response.parsedBody.error.code == CONFLICT
+
+###
+
+# @name crearCategoriaBoleta
+POST {{baseUrl}}/categorias/
+Content-Type: application/json
+
+{
+  "nombre_categoria": "Categoria Boleta {{sufijo}}",
+  "descripcion": "Categoria auxiliar para numero_boleta",
+  "activa": true
+}
+
+?? status == 201
+
+###
+
+# @name crearProductoBoleta
+# @ref crearCategoriaBoleta
+POST {{baseUrl}}/productos/
+Content-Type: application/json
+
+{
+  "nombre_producto": "Producto Boleta {{sufijo}}",
+  "descripcion": "Producto auxiliar para numero_boleta",
+  "stock": 10,
+  "stock_minimo": 1,
+  "id_categoria": "{{crearCategoriaBoleta.id_categoria}}",
+  "precio": 200
+}
+
+?? status == 201
+
+###
+
+# @name crearVentaBoletaA
+# @ref crearProductoBoleta
+POST {{baseUrl}}/ventas
+Content-Type: application/json
+
+{
+  "cliente": "BoletaA{{sufijo}}",
+  "detalles": [
+    {
+      "id_producto": "{{crearProductoBoleta.id_producto}}",
+      "cantidad_producto": 1
+    }
+  ]
+}
+
+?? status == 201
+?? body numero_boleta exists
+?? body numero_boleta includes BOL-
+
+###
+
+# @name crearVentaBoletaB
+# @ref crearProductoBoleta
+POST {{baseUrl}}/ventas
+Content-Type: application/json
+
+{
+  "cliente": "BoletaA{{sufijo}}",
+  "detalles": [
+    {
+      "id_producto": "{{crearProductoBoleta.id_producto}}",
+      "cantidad_producto": 2
+    }
+  ]
+}
+
+?? status == 201
+?? body numero_boleta exists
+?? body numero_boleta includes BOL-
+?? js response.parsedBody.numero_boleta != "{{crearVentaBoletaA.numero_boleta}}"
+
+###
+
+# @name boletaNumeroUnico
+# @ref crearVentaBoletaA
+GET {{baseUrl}}/ventas/{{crearVentaBoletaA.id_venta}}/boleta
+
+?? status == 200
+?? body numero_boleta == {{crearVentaBoletaA.numero_boleta}}
+?? js response.parsedBody.items.length == 1
+
+###
+
+# @name ventaConNumeroBoleta
+# @ref crearVentaBoletaA
+GET {{baseUrl}}/ventas/{{crearVentaBoletaA.id_venta}}
+
+?? status == 200
+?? body numero_boleta == {{crearVentaBoletaA.numero_boleta}}
+
+###
+
+# @name detallesVentaBoleta
+# @ref crearVentaBoletaA
+GET {{baseUrl}}/ventas/{{crearVentaBoletaA.id_venta}}/detalles
+
+?? status == 200
+?? js response.parsedBody.length == 1
+?? js response.parsedBody[0].id_detalle != null
+?? js response.parsedBody[0].precio_unitario == 200
+
+###
+
+# @name listarVentasBoleta
+# @ref crearVentaBoletaA
+# @ref crearVentaBoletaB
+GET {{baseUrl}}/ventas?cliente=BoletaA{{sufijo}}&ordenar_por=total&direccion=desc&pagina=1&limite=1
+
+?? status == 200
+?? js response.parsedBody.total == 2
+?? js response.parsedBody.total_paginas == 2
+?? js response.parsedBody.items.length == 1
+
+###
+
+# @name limpiarVentaBoletaA
+# @ref crearVentaBoletaA
+DELETE {{baseUrl}}/ventas/{{crearVentaBoletaA.id_venta}}
+
+?? status == 204
+
+###
+
+# @name limpiarVentaBoletaB
+# @ref crearVentaBoletaB
+DELETE {{baseUrl}}/ventas/{{crearVentaBoletaB.id_venta}}
+
+?? status == 204
+
+###
+
+# @name limpiarProductoBoleta
+# @ref crearProductoBoleta
+DELETE {{baseUrl}}/productos/{{crearProductoBoleta.id_producto}}
+
+?? status == 204
+
+###
+
+# @name limpiarCategoriaBoleta
+# @ref crearCategoriaBoleta
+DELETE {{baseUrl}}/categorias/{{crearCategoriaBoleta.id_categoria}}
+
+?? status == 204
+
+###
+
+# @name crearCategoriaCantidadInvalida
+POST {{baseUrl}}/categorias/
+Content-Type: application/json
+
+{
+  "nombre_categoria": "Categoria Cantidad {{sufijo}}",
+  "descripcion": "Categoria auxiliar para cantidad inválida",
+  "activa": true
+}
+
+?? status == 201
+
+###
+
+# @name crearProductoCantidadInvalida
+# @ref crearCategoriaCantidadInvalida
+POST {{baseUrl}}/productos/
+Content-Type: application/json
+
+{
+  "nombre_producto": "Producto Cantidad {{sufijo}}",
+  "descripcion": "Producto auxiliar para cantidad inválida",
+  "stock": 5,
+  "stock_minimo": 1,
+  "id_categoria": "{{crearCategoriaCantidadInvalida.id_categoria}}",
+  "precio": 100
+}
+
+?? status == 201
+
+###
+
+# @name ventaCantidadCero
+# @ref crearProductoCantidadInvalida
+POST {{baseUrl}}/ventas
+Content-Type: application/json
+
+{
+  "cliente": "Cliente Cantidad {{sufijo}}",
+  "detalles": [
+    {
+      "id_producto": "{{crearProductoCantidadInvalida.id_producto}}",
+      "cantidad_producto": 0
+    }
+  ]
+}
+
+?? status == 400
+?? js response.parsedBody.error.code == BUSINESS_RULE_VIOLATION
+
+###
+
+# @name stockTrasCantidadInvalida
+# @ref crearProductoCantidadInvalida
+GET {{baseUrl}}/productos/{{crearProductoCantidadInvalida.id_producto}}
+
+?? status == 200
+?? js response.parsedBody.stock == 5
+
+###
+
+# @name limpiarProductoCantidadInvalida
+# @ref crearProductoCantidadInvalida
+DELETE {{baseUrl}}/productos/{{crearProductoCantidadInvalida.id_producto}}
+
+?? status == 204
+
+###
+
+# @name limpiarCategoriaCantidadInvalida
+# @ref crearCategoriaCantidadInvalida
+DELETE {{baseUrl}}/categorias/{{crearCategoriaCantidadInvalida.id_categoria}}
+
+?? status == 204
+
+###
+
+# @name ventaProductoInexistente
+POST {{baseUrl}}/ventas
+Content-Type: application/json
+
+{
+  "cliente": "Cliente Inexistente {{sufijo}}",
+  "detalles": [
+    {
+      "id_producto": "00000000-0000-0000-0000-000000000000",
+      "cantidad_producto": 1
+    }
+  ]
+}
+
+?? status == 404
+?? js response.parsedBody.error.code == RESOURCE_NOT_FOUND
+
+###
+
+# @name crearCategoriaRepetido
+POST {{baseUrl}}/categorias/
+Content-Type: application/json
+
+{
+  "nombre_categoria": "Categoria Repetido {{sufijo}}",
+  "descripcion": "Categoria auxiliar para producto repetido",
+  "activa": true
+}
+
+?? status == 201
+
+###
+
+# @name crearProductoRepetido
+# @ref crearCategoriaRepetido
+POST {{baseUrl}}/productos/
+Content-Type: application/json
+
+{
+  "nombre_producto": "Producto Repetido {{sufijo}}",
+  "descripcion": "Producto auxiliar para producto repetido",
+  "stock": 5,
+  "stock_minimo": 1,
+  "id_categoria": "{{crearCategoriaRepetido.id_categoria}}",
+  "precio": 100
+}
+
+?? status == 201
+
+###
+
+# @name ventaProductoRepetidoExcede
+# @ref crearProductoRepetido
+POST {{baseUrl}}/ventas
+Content-Type: application/json
+
+{
+  "cliente": "Cliente Repetido {{sufijo}}",
+  "detalles": [
+    {
+      "id_producto": "{{crearProductoRepetido.id_producto}}",
+      "cantidad_producto": 3
+    },
+    {
+      "id_producto": "{{crearProductoRepetido.id_producto}}",
+      "cantidad_producto": 3
+    }
+  ]
+}
+
+?? status == 400
+?? js response.parsedBody.error.code == BUSINESS_RULE_VIOLATION
+
+###
+
+# @name ventaFalloParcialSinStock
+# @ref crearProductoRepetido
+POST {{baseUrl}}/ventas
+Content-Type: application/json
+
+{
+  "cliente": "Cliente Fallo Parcial {{sufijo}}",
+  "detalles": [
+    {
+      "id_producto": "{{crearProductoRepetido.id_producto}}",
+      "cantidad_producto": 1
+    },
+    {
+      "id_producto": "00000000-0000-0000-0000-000000000000",
+      "cantidad_producto": 1
+    }
+  ]
+}
+
+?? status == 404
+?? js response.parsedBody.error.code == RESOURCE_NOT_FOUND
+
+###
+
+# @name stockTrasFalloParcial
+# @ref crearProductoRepetido
+GET {{baseUrl}}/productos/{{crearProductoRepetido.id_producto}}
+
+?? status == 200
+?? js response.parsedBody.stock == 5
+
+###
+
+# @name ventaProductoRepetidoValido
+# @ref crearProductoRepetido
+POST {{baseUrl}}/ventas
+Content-Type: application/json
+
+{
+  "cliente": "Cliente Repetido Valido {{sufijo}}",
+  "detalles": [
+    {
+      "id_producto": "{{crearProductoRepetido.id_producto}}",
+      "cantidad_producto": 1
+    },
+    {
+      "id_producto": "{{crearProductoRepetido.id_producto}}",
+      "cantidad_producto": 2
+    }
+  ]
+}
+
+?? status == 201
+?? js response.parsedBody.detalles.length == 2
+?? js response.parsedBody.total == 300
+
+###
+
+# @name stockTrasVentaRepetida
+# @ref crearProductoRepetido
+GET {{baseUrl}}/productos/{{crearProductoRepetido.id_producto}}
+
+?? status == 200
+?? js response.parsedBody.stock == 2
+
+###
+
+# @name eliminarVentaRepetida
+# @ref ventaProductoRepetidoValido
+DELETE {{baseUrl}}/ventas/{{ventaProductoRepetidoValido.id_venta}}
+
+?? status == 204
+
+###
+
+# @name stockRestauradoTrasEliminar
+# @ref crearProductoRepetido
+GET {{baseUrl}}/productos/{{crearProductoRepetido.id_producto}}
+
+?? status == 200
+?? js response.parsedBody.stock == 5
+
+###
+
+# @name limpiarProductoRepetido
+# @ref crearProductoRepetido
+DELETE {{baseUrl}}/productos/{{crearProductoRepetido.id_producto}}
+
+?? status == 204
+
+###
+
+# @name limpiarCategoriaRepetido
+# @ref crearCategoriaRepetido
+DELETE {{baseUrl}}/categorias/{{crearCategoriaRepetido.id_categoria}}
+
+?? status == 204

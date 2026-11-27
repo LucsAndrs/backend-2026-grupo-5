@@ -6,11 +6,12 @@ from app.models.venta_modelos import VentaBD
 from app.models.detalle_venta_modelos import DetalleVentaBD
 
 class VentaRepositorio:
-    def crear_venta(self, bd: Session, venta: Venta) -> Venta:
+    def crear_venta(self, bd: Session, venta: Venta, commit: bool = True) -> Venta:
         venta_bd = VentaBD(
             id_venta=venta.id_venta,
             cliente=venta.cliente,
             fecha_venta=venta.fecha_venta,
+            numero_boleta=venta.numero_boleta,
             total=venta.total
         )
 
@@ -28,8 +29,10 @@ class VentaRepositorio:
             venta_bd.detalles.append(detalle_bd)
 
         bd.add(venta_bd)
-        bd.commit()
-        bd.refresh(venta_bd)
+        bd.flush()
+        if commit:
+            bd.commit()
+            bd.refresh(venta_bd)
         return venta
 
     def obtener_por_id(self, bd: Session, id_venta: str) -> Venta:
@@ -53,23 +56,31 @@ class VentaRepositorio:
                     )
                 )
 
-            return Venta(
-                id_venta=venta_bd.id_venta,
-                cliente=venta_bd.cliente,
-                fecha_venta=venta_bd.fecha_venta,
-                total=venta_bd.total,
-                detalles=detalles_bd
-            )
+        return Venta(
+            id_venta=venta_bd.id_venta,
+            cliente=venta_bd.cliente,
+            fecha_venta=venta_bd.fecha_venta,
+            numero_boleta=venta_bd.numero_boleta,
+            total=venta_bd.total,
+            detalles=detalles_bd
+        )
+
+    def existe_numero_boleta(self, bd: Session, numero_boleta: str) -> bool:
+        return bd.query(VentaBD.id_venta).filter(
+            VentaBD.numero_boleta == numero_boleta
+        ).first() is not None
 
     def listar_todas(self, bd: Session) -> list[Venta]:
         ventas_bd = bd.query(VentaBD).all()
         return [self.obtener_por_id(bd, v.id_venta) for v in ventas_bd]
 
-    def eliminar_venta(self, bd: Session, id_venta: str):
+    def eliminar_venta(self, bd: Session, id_venta: str, commit: bool = True):
         venta_bd = bd.query(VentaBD).filter(VentaBD.id_venta == id_venta).first()
         if not venta_bd:
             raise ResourceNotFoundError(f"No existe una venta con el ID {id_venta}")
         bd.delete(venta_bd)
-        bd.commit()
+        bd.flush()
+        if commit:
+            bd.commit()
 
 venta_repositorio = VentaRepositorio()

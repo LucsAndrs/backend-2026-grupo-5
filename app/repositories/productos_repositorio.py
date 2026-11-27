@@ -28,7 +28,7 @@ class ProductoRepositorio:
             raise ResourceNotFoundError("No existe un producto con el ID solicitado")
         return self._a_entidad(producto)
 
-    def actualizar(self, bd: Session, id_producto: str, entidad: Producto) -> Producto:
+    def actualizar(self, bd: Session, id_producto: str, entidad: Producto, commit: bool = True) -> Producto:
         producto = bd.query(ProductoBD).filter(ProductoBD.id_producto == id_producto).first()
         if producto is None:
             raise ResourceNotFoundError("No existe un producto con el ID solicitado")
@@ -39,7 +39,8 @@ class ProductoRepositorio:
         producto.id_categoria = entidad.id_categoria
         producto.precio = entidad.precio
         producto.fecha_actualizacion = entidad.fecha_actualizacion
-        bd.commit()
+        if commit:
+            bd.commit()
         return entidad
 
     def eliminar(self, bd: Session, id_producto: str) -> None:
