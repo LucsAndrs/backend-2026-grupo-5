@@ -18,3 +18,8 @@ class ConflictError(ApiError):
 class BusinessRuleError(ApiError):
     code = "BUSINESS_RULE_VIOLATION"
     status_code = 400
+
+
+class InternalError(ApiError):
+    code = "INTERNAL_ERROR"
+    status_code = 500

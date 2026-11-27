@@ -8,6 +8,7 @@ from app.domain.detalleventa import DetalleVenta
 class Venta:
     cliente: str
     fecha_venta: date
+    numero_boleta: str
     total: float = 0.0
     id_venta: str = field(default_factory=lambda: str(uuid.uuid4()))
     detalles: list[DetalleVenta] = field(default_factory=list)

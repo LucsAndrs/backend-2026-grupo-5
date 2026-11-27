@@ -1,16 +1,18 @@
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
+from sqlalchemy.exc import IntegrityError
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from .excepciones import ApiError
 from .routers import categorias_ruta, productos_ruta, venta_ruta
 from .routers.pago_ruta import router as pago_router
 from .routers.detalle_venta_ruta import router as detalle_venta_router
-from .schemas.common import ErrorDetail, ErrorResponse
+from .schemas.common import ERROR_RESPONSES, ErrorDetail, ErrorResponse
 
 
-app = FastAPI()
+app = FastAPI(responses=ERROR_RESPONSES)
+
 
 def _envelope(code: str, message: str, details: list[str]) -> dict:
     return ErrorResponse(error=ErrorDetail(code=code, message=message, details=details)).model_dump()
@@ -40,6 +42,15 @@ async def controlar_http_error(request: Request, exc: StarletteHTTPException):
         content=_envelope("HTTP_ERROR", str(exc.detail), []),
     )
 
+
+@app.exception_handler(IntegrityError)
+async def controlar_integrity_error(request: Request, exc: IntegrityError):
+    return JSONResponse(
+        status_code=409,
+        content=_envelope("CONFLICT", "El cambio viola una restricción de integridad de la base de datos", []),
+    )
+
+
 app.include_router(venta_ruta.router)
 app.include_router(categorias_ruta.router)
 app.include_router(productos_ruta.router)
@@ -47,4 +58,3 @@ app.include_router(detalle_venta_router)
 app.include_router(pago_router)
 
 from .models import categoria_modelos, pago_modelos, producto_modelos, venta_modelos
-
