@@ -859,6 +859,42 @@ Content-Type: application/json
 
 ###
 
+# @name ventaClienteVacio
+# @ref crearProductoCantidadInvalida
+POST {{baseUrl}}/ventas
+Content-Type: application/json
+
+{
+  "cliente": "   ",
+  "detalles": [
+    {
+      "id_producto": "{{crearProductoCantidadInvalida.id_producto}}",
+      "cantidad_producto": 1
+    }
+  ]
+}
+
+?? status == 422
+?? js response.parsedBody.error.code == VALIDATION_ERROR
+?? js response.parsedBody.error.details.length > 0
+
+###
+
+# @name ventaDetallesVacios
+POST {{baseUrl}}/ventas
+Content-Type: application/json
+
+{
+  "cliente": "Cliente Detalles Vacios {{sufijo}}",
+  "detalles": []
+}
+
+?? status == 422
+?? js response.parsedBody.error.code == VALIDATION_ERROR
+?? js response.parsedBody.error.details.length > 0
+
+###
+
 # @name stockTrasCantidadInvalida
 # @ref crearProductoCantidadInvalida
 GET {{baseUrl}}/productos/{{crearProductoCantidadInvalida.id_producto}}

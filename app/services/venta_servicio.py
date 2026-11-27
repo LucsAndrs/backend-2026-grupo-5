@@ -158,7 +158,7 @@ class VentaServicio:
         if cliente:
             ventas_filtradas = []
             for v in ventas:
-                if v.cliente.lower() == cliente.lower():
+                if cliente.lower() in v.cliente.lower():
                     ventas_filtradas.append(v)
             ventas = ventas_filtradas
 

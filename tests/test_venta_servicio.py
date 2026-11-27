@@ -2,6 +2,7 @@ import unittest
 from datetime import date, datetime
 from unittest.mock import patch
 
+from pydantic import ValidationError
 from sqlalchemy import create_engine
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import sessionmaker
@@ -132,6 +133,13 @@ class VentaServicioTests(unittest.TestCase):
         self.assertEqual(producto.stock, 10)
         with self.assertRaises(ResourceNotFoundError):
             venta_repositorio.obtener_por_id(self.bd, creada.id_venta)
+
+    def test_cliente_no_vacio_en_schema(self):
+        with self.assertRaises(ValidationError):
+            VentaCreada(
+                cliente="   ",
+                detalles=[DetalleVentaCrear(id_producto=self.producto_id, cantidad_producto=1)],
+            )
 
 
 if __name__ == "__main__":

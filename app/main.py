@@ -51,14 +51,6 @@ async def controlar_integrity_error(request: Request, exc: IntegrityError):
     )
 
 
-@app.exception_handler(Exception)
-async def controlar_error_interno(request: Request, exc: Exception):
-    return JSONResponse(
-        status_code=500,
-        content=_envelope("INTERNAL_ERROR", "Error interno del servidor", []),
-    )
-
-
 app.include_router(venta_ruta.router)
 app.include_router(categorias_ruta.router)
 app.include_router(productos_ruta.router)
