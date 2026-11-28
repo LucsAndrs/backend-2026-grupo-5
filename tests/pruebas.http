@@ -493,6 +493,46 @@ GET {{baseUrl}}/ventas/{{crearVentaPersistencia.id_venta}}/boleta
 
 ###
 
+# @name listarDetallesPersistidos
+# @ref crearVentaPersistencia
+GET {{baseUrl}}/ventas/{{crearVentaPersistencia.id_venta}}/detalles
+
+?? status == 200
+?? js response.parsedBody.length == 1
+?? js Object.is(response.parsedBody[0].id_venta,crearVentaPersistencia.id_venta) == true
+?? js response.parsedBody[0].subtotal == 2000
+
+###
+
+# @name leerDetallePersistido
+# @ref crearVentaPersistencia
+GET {{baseUrl}}/ventas/{{crearVentaPersistencia.id_venta}}/detalles/{{crearVentaPersistencia.detalles[0].id_detalle}}
+
+?? status == 200
+?? js Object.is(response.parsedBody.id_venta,crearVentaPersistencia.id_venta) == true
+?? js Object.is(response.parsedBody.id_producto,crearVentaPersistencia.detalles[0].id_producto) == true
+?? js response.parsedBody.cantidad_producto == 2
+
+###
+
+# @name leerDetalleEnOtraVenta
+# @ref crearVentaPersistencia
+GET {{baseUrl}}/ventas/00000000-0000-4000-8000-000000000000/detalles/{{crearVentaPersistencia.detalles[0].id_detalle}}
+
+?? status == 404
+?? js response.parsedBody.error.code == RESOURCE_NOT_FOUND
+
+###
+
+# @name listarDetallesVentaInexistente
+GET {{baseUrl}}/ventas/00000000-0000-4000-8000-000000000000/detalles
+
+?? status == 200
+?? js Array.isArray(response.parsedBody) == true
+?? js response.parsedBody.length == 0
+
+###
+
 # @name limpiarVentaPersistencia
 # @ref crearVentaPersistencia
 DELETE {{baseUrl}}/ventas/{{crearVentaPersistencia.id_venta}}
